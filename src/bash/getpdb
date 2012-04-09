@@ -1,0 +1,9 @@
+#!/bin/sh
+# getpdb -- download a git PDB from rcsb.org
+#
+# Author: Christoph Champ <christoph.champ@gmail.com>
+# Last update: 2012-04-08
+#
+# Usage: getpdb PDB_ID
+wget http://www.rcsb.org/pdb/files/$1.pdb.gz
+gunzip $1.pdb.gz
