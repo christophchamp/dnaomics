@@ -1,0 +1,25 @@
+## Christoph's additions
+export PATH=/home/champ/bin:$PATH
+export VISUAL=vim
+export EDITOR=/usr/bin/vim
+export GIT_EDITOR=/usr/bin/vim
+export SVN_EDITOR=/usr/bin/vim
+#alias lpr='lpr -P Rollright860'
+alias ll='ls -lXhp'
+alias lt='ls -lhpXtr'
+alias rm='rm -i'
+alias shred='shred -xvzu'
+alias zp='zypper'
+alias psc='ps xawf -eo pid,user,cgroup,args'
+alias t='/home/champ/bin/todo.sh'
+complete -F _todo t
+# Nifty extras
+alias webshare='python -c "import SimpleHTTPServer;SimpleHTTPServer.test()"'
+alias servethis="python -c 'import SimpleHTTPServer; SimpleHTTPServer.test()'"
+alias pypath='python -c "import sys; print sys.path" | tr "," "\n" | grep -v "egg"'
+alias pycclean='find . -name "*.pyc" -exec rm {} \;'
+#alias ssh='ssh -R 10999:localhost:22'
+alias nethack='telnet nethack.alt.org'
+alias cmy='mysql -B -N -e'
+
+PS1='\[\033[0;31m\]\u@newton\[\033[00m\]:\[\033[0;33m\]`pwd`\[\033[00m\]> '
