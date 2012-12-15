@@ -1,0 +1,168 @@
+Exercise 4
+
+OBJECTIVES
+To get familiar with methods for assigning protein function by using Hidden Markov Models.
+
+
+   1.
+      LOG IN
+      Open a session on 'organism.cbs.dtu.dk', and from this login to ibiology and create directories for you to work in:
+
+      ssh -X ibiology
+      mkdir Ex4
+      cd Ex4
+      mkdir source
+
+   2.
+      PREDICTING SIGMA FACTORS
+      We will start out by using an HMM to query the proteins that you have predicted in Exercise 1. We have prepared three HMMs from alignments of three types of Sigma factors, σ 54, σ 70, and ECF. The HMMs you are going to use have been calibrated in such a way, that alignment scores greater than zero are considered significant (or at least better than the NULL model)
+
+      You will be using the database table cmp_genomics.features to store your category asignments (by using the 'note' field.
+
+      But we will start out by generating hmmsearch reports of the protein files you generated in Exercise 3
+         1.
+
+            foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
+               foreach type (s54 s70 ecf)
+                 /usr/cbs/tools/lib/make/bin/hmmsearch.Linux /usr/cbs/tools/lib/make/kiil/HMMsigma/$type.hmm \
+                     ../Ex3/source/$accession.proteins.fsa > source/$accession.proteins.$type.sigmas.hmmsearch &
+               end
+            end
+            wait
+             
+
+            How many HMM searches have you initiated? Try first and view the content of a hmmsearch report ( use spacebar to scroll and 'q' to quit ). In this report, you should find one protein with a score better than zero:
+         2.
+
+            less source/AE017042.proteins.ecf.sigmas.hmmsearch
+             
+
+            Ok. Now you have the hmmsearch reports, but you need to extract the feature names. The following command will filter the report and extract the gene names of the significant results and place a comment in the database table.
+         3.
+
+            mysql -B -e "update cmp_genomics.features set note = '' where user = USER() and note not like 'tcs%' or note is null"
+            foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
+               foreach type (ecf s54 s70)
+                 cat source/$accession.proteins.$type.sigmas.hmmsearch | \
+                 perl -ne 'next unless /^CDS_(\d+)\-(\d+)_DIR([\-\+]+)\s+([0-9\-\.e]+)\s+([0-9\-\.e]+)\s+/;\
+                           my ($start,$stop,$dir,$score,$evalue) = ($1,$2,$3,$4,$5);\
+                           next unless $score > 0;\
+                           print "update cmp_genomics.features set note = \"Sigma Factor '$type'\" \
+                                  where start=$start and stop = $stop and user = user() and accession = \"'$accession'\";\n";'\
+                 | mysql
+               end
+            end
+
+             
+
+         4. Start the mysql client and try and review all the predictions you made by querying the MySQL table:
+
+            mysql
+            mysql>select start,stop,dir,note from cmp_genomics.features \
+                  where user=USER() and note like 'Sigma Factor%' and accession = 'CP000034' order by start;
+             
+
+         5. And it probably does not come as a surprise that we can easily count the occurences in each genome by a single query:
+
+            mysql>select features.note,genomes.accession,genomes.organism,count(*) \
+                  from cmp_genomics.features,cmp_genomics.genomes \
+                  where genomes.accession=features.accession and genomes.user = features.user \
+                        and  features.user=USER() and note like 'Sigma Factor%' \
+                  group by note,genomes.accession order by note,genomes.accession;
+             
+
+         6. The following query will access the MySQL table of the Genome Atlas Database. It will allow you to see the average number of σ54,σ70, and ECF Sigma Factors found in all the Bacterial species and the Bacterial phyla. Grouped by Species
+
+            mysql>select concat(genus,' ',species),count(*) as Count,avg(SIGMA54_PROMOTERS_COUNT) as AvgS54Count, \
+                         avg(SIGMA70_PROMOTERS_COUNT) as AvgS70Count,avg(SIGMAECF_PROMOTERS_COUNT) as AvgECFCount \
+                  from genomeatlas.atlasdb \
+                  where kingdom='bacteria' and ( segment = 'main' or segment >= 1) \
+                  group by genus,species;
+
+         7. Grouped by Phyla
+
+            mysql>select TAXLONG_PHYLA,count(*) as Count,avg(SIGMA54_PROMOTERS_COUNT) as AvgS54Count, \
+                         avg(SIGMA70_PROMOTERS_COUNT) as AvgS70Count,avg(SIGMAECF_PROMOTERS_COUNT) as AvgECFCount \
+                  from genomeatlas.atlasdb \
+                  where kingdom='bacteria' and ( segment = 'main' or segment >= 1) \
+                  group by TAXLONG_PHYLA;
+            mysql>exit
+              
+
+            How does this compare with your results? 
+   3.
+      PREDICTING TWO COMPONENT SYSTEMS
+      The second part of todays exercise is about predicting two-component systems.
+
+      We will use the same procedure like with the sigma factors.
+         1.
+
+            foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
+               foreach type (RRreciever HisKA_1 HisKA_2 HisKA_3 HWE_HK)
+                 /usr/cbs/tools/lib/make/bin/hmmsearch.Linux --cut_tc /usr/cbs/tools/lib/make/pfh/TCS/$type.hmm \
+                   ../Ex3/source/$accession.proteins.fsa > source/$accession.$type.TCS.hmmsearch &
+               end
+            end
+            wait
+            				
+
+         2. Try first and view the content of a hmmsearch report ( use spacebar to scroll and 'q' to quit ). In this report, you should find several proteins with a score better than zero:
+
+            less source/AE017042.RRreciever.TCS.hmmsearch
+             
+
+         3. The following command will filter the report and extract the gene names of the significant results and place a comment in the database table:
+
+            mysql -B -e "update cmp_genomics.features set note = '' where user = USER() and note not like 'sigma%' or note is null"
+            foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
+               foreach type (RRreciever HisKA_1 HisKA_2 HisKA_3 HWE_HK)
+                 cat source/$accession.$type.TCS.hmmsearch | \
+                 perl -ne 'next unless /^CDS_(\d+)\-(\d+)_DIR([\-\+]+)\s+([0-9\-\.e]+)\s+([0-9\-\.e]+)\s+/;\
+                           my ($start,$stop,$dir,$score,$evalue) = ($1,$2,$3,$4,$5);\
+                           next unless $score > 0; \
+                           print "update cmp_genomics.features set note = \"TCS '$type'\" \
+                                  where start=$start and stop = $stop and user = user() and accession = \"'$accession'\";\n";'\
+                 | mysql -B
+               end
+            end
+             
+
+         4. Exactly like we did before, listing the predicted two-component systems you have predicted of a given accession number, here CP000036)
+
+            mysql
+            mysql>select start,stop,dir,note from cmp_genomics.features where user=USER() and note like 'TCS%' and accession = 'CP000036' order by start;
+
+             
+
+         5. Exactly like we did before, cross-referencing the organism names and the features you predicted
+
+            mysql>select features.note,genomes.accession,organism,count(*) \
+                  from cmp_genomics.features,cmp_genomics.genomes \
+                  where  genomes.accession=features.accession and genomes.user = features.user \
+                         and  features.user=USER() and note like 'TCS%'  \
+                  group by note,genomes.accession order by genomes.accession,note;
+             
+
+         6. The following query will access the MySQL table of the Genome Atlas Database. It will allow you to see the average number of TCS' in all the Bacterial species and the Bacterial phyla. Grouped by Species
+
+            mysql>select concat(genus,' ',species),count(*) as Count,avg(HISKA_1_COUNT) as HisKA1Count, \
+                         avg(HISKA_2_COUNT) as HisKA2Count, avg(HISKA_3_COUNT) as HisKA3Count,\
+                         avg(HWE_HK_COUNT) as HWEHKCount,avg(RRRECIEVER_COUNT) as RRrecieverCount \
+                  from genomeatlas.atlasdb \
+                  where kingdom='bacteria' and ( segment = 'main' or segment >= 1) \
+                  group by genus,species;
+             
+
+         7. Grouped by Phyla
+
+            mysql>select TAXLONG_PHYLA,count(*) as Count,avg(HISKA_1_COUNT) as HisKA1Count, avg(HISKA_2_COUNT) as HisKA2Count, \
+                         avg(HISKA_3_COUNT) as HisKA3Count,avg(HWE_HK_COUNT) as HWEHKCount,avg(RRRECIEVER_COUNT) as RRrecieverCount \
+                  from genomeatlas.atlasdb \
+                  where kingdom='bacteria' and ( segment = 'main' or segment >= 1) \
+                  group by TAXLONG_PHYLA;
+            mysql>exit
+              
+
+            How does this compare with your results?
+
+This file is last modified Thursday 12th of October 2006 09:46:20 GMT
