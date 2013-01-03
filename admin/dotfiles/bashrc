@@ -1,3 +1,13 @@
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    [ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
+    [ -e "$DIR_COLORS" ] || DIR_COLORS=""
+    eval "`dircolors -b $DIR_COLORS`"
+    alias ls='ls --color=auto'
+fi
+
+test -s ~/.alias && . ~/.alias || true
+
 ## Christoph's additions
 export PATH=/home/champ/bin:$PATH
 export VISUAL=vim
@@ -5,10 +15,10 @@ export EDITOR=/usr/bin/vim
 export GIT_EDITOR=/usr/bin/vim
 export SVN_EDITOR=/usr/bin/vim
 #alias lpr='lpr -P Rollright860'
-alias ll='ls -lXhp'
-alias lt='ls -lhpXtr'
+alias ll='ls -lXhp --color=auto'
+alias lt='ls -lhpXtr --color=auto'
 alias rm='rm -i'
-alias shred='shred -xvzu' # Completey destroys file(s)!
+alias shred='shred -xvzu' # Warning! Completey destroys file(s)!
 alias zp='zypper'
 alias psc='ps xawf -eo pid,user,cgroup,args'
 alias t='/home/champ/bin/todo.sh'
@@ -18,6 +28,7 @@ alias webshare='python -c "import SimpleHTTPServer;SimpleHTTPServer.test()"'
 alias servethis="python -c 'import SimpleHTTPServer; SimpleHTTPServer.test()'"
 alias pypath='python -c "import sys; print sys.path" | tr "," "\n" | grep -v "egg"'
 alias pycclean='find . -name "*.pyc" -exec rm {} \;'
+alias pymods='python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"'
 #alias ssh='ssh -R 10999:localhost:22'
 alias nethack='telnet nethack.alt.org'
 alias cmy='mysql -B -N -e'
