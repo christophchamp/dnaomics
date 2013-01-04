@@ -1,0 +1,48 @@
+DESCRIPTION: Various calculations for AU / light-year, etc.
+DATE: 2012-07-26
+-------------------------------------------------------------------------------
+Speed of light = 300,000 km/sec
+Seconds in a year = 60 X 60 X 24 X 365.25 = 31,557,600
+Distance traveled in a year = speed in km/sec X seconds
+= 9,467,280,000,000 km = 1 Light Year
+
+1 AU = 149,598,500 km
+
+Number of AU in 1 LY =
+
+9,467,280,000,000 km
+____________________ =
+149,598,500 km
+
+9,467,280,000 / 149,598.5 =
+946728 / 15 = 63115.2
+AU / LY
+-------------------------------------------------------------------------------
+c = speed of light = 2.99792458E+8 m/s
+y = seconds per (tropical) year = 31556926
+cy = one lightyear in meters = 9.460528412641E+15 meters
+au = one astronomical unit = 1.49597870691E+11 meters
+There are cy/au astronomical units in one lightyear.
+cy/au = 63239.7
+If you use the Julian year instead of the tropical year to calculate the number of meters in a lightyear, then
+y = 31557600
+cy = 9.46073047258E+15 meters
+cy/au = 63241.1
+-------------------------------------------------------------------------------
+wikipedia:
+1 light-year = 63.241 × 10^3 AU = 63,241 AU
+1 AU = 149,597,870,700 metres = 149.60 x 10^6 km = 149.60 x 10^9 m
+1 AU = ~499 seconds (8.32 minutes) for light to travel this distance
+1 light-year = 9460730472580800 metres (exactly)
+1 year = 365.25 days (exactly)
+1 year = 86400 SI seconds, totalling 31,557,600 seconds)
+speed of light = 299792458 m/s
+-------------------------------------------------------------------------------
+speed of light in AU/hr:
+2.998 x 10^8m/s = (2.998x10^8 m/s)/(1000 m/km)
+= 2.998 x 10^5 km/s = (2.998x10^5 km/s)*(3600 s/h)
+= 10792.8 x 10^5 km/h = 1.07928 x 10^9 km/h
+= (1.07928 x10^9 km/h)(1/(1.50 x 10^8 km/Au)
+= 0.71952 x10^1 Au/ h= 7.1952 Au/h,
+which rounds to 7.20 Au/h at 3 significant figures
+(the accuracy of the least accurate data "1.50 x10^8 km/Au"). 
