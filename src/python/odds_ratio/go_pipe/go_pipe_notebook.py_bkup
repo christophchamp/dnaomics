@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+## test_go_pipe - A "Notebook" for testing the go_pipe modules.
+import sys
+import getopt
+from optparse import OptionParser
+
+## Local modules
+from calc_statistics import calc_statistics
+from threshold import get_threshold_go_list
+from calc_hypergeometric import calc_hypergeometric
+
+_USAGE = """
+run_go_pipeline.py - main wrapper for sub-modules of the "GO Pipeline"
+
+Command Line Usage:
+  run_go_pipeline.py [-h] this help screen
+                     [-l] print list of available statistics then exit.
+                     [-c control_id] string of which class in the metadata
+                         file is the "Control" state (i.e., opposite of the 
+                         "Disease" state).
+                     [-s which_statistic] string of which statistic to use
+                         with the threshold (e.g., odds_ratio).
+                     [-t threshold] float of threshold value (e.g., 2.0)
+                     abund_file metadata_file pathway_file stats_file
+Example usage:
+  run_go_pipeline.py -c Control -s odds_ratio -t 2.0 \\
+                     abund.tab meta.tab path.csv stats.tab
+"""
+def usage():
+    print _USAGE
+    raise SystemExit
+
+#AVAILABLE_STATISTICS = ['odds_ratio', 'log2_OR', 'mean_ratio', 'ttest',
+#                        'wilcoxon', 'ranksums']
+AVAILABLE_STATISTICS = ['odds_ratio', 'log2_OR', 'mean_ratio', 'ttest',
+                        'ranksums']
+
+def exec_go_pipeline(abund_file, metadata_file, pathway_file, stats_file,
+                     opt_dict):
+    """
+    Main analysis wrapper for the "GO Pipeline"
+
+    Input files
+    Parameters
+    Output files
+    Returns
+    """
+    ## Set the Control_ID (argument required!)
+    if opt_dict.has_key("-c"):
+        control_id = str(opt_dict.get("-c"))
+    else:
+        print "ERROR: No Control_ID given. Exiting."
+        sys.exit(1)
+
+    ## Set which statistic to use with threshold.
+    if opt_dict.has_key("-s"):
+        which_statistic = str(opt_dict.get("-s"))
+    else:
+        print "ERROR: Which statistic for threshold not given. Exiting."
+        sys.exit(1)
+
+    ## Set the 'threshold' float value
+    if opt_dict.has_key("-t"):
+        threshold = float(opt_dict.get("-t"))
+    else:
+        print "ERROR: Threshold value not given. Exiting."
+        sys.exit(1)
+
+    ## Get the pathway_list
+    if opt_dict.has_key("-p"):
+        pathway_ids_list = opt_dict.get("-p").split(',')
+    else:
+        print "ERROR: List of pathway_ids to use not given. Exiting."
+        sys.exit(1)
+
+    ## Calculate various statistics on abund_file
+    go_list, err = calc_statistics(abund_file, metadata_file, stats_file,
+                                   control_id, AVAILABLE_STATISTICS)
+
+    ## If there are any errors (e.g., wrong TAB format), print them then exit
+    if err != '':
+        print err
+        sys.exit(1)
+
+    ## Get a list of GOs above the given threshold for the given statistic
+    threshold_go_list = get_threshold_go_list(go_list, stats_file, 
+                                              which_statistic, threshold)
+
+    ## Calcualate p-values from the hypergeometric probability mass function
+    ## using the GOs above the threshold
+    pvalues, err = calc_hypergeometric(pathway_file, stats_file, go_list,
+                                       threshold_go_list, pathway_ids_list)
+
+    ## If there are any errors (e.g., non-existant ids), print them then exit
+    if err != '':
+        print err
+        sys.exit(1)
+
+    ## Finally, print out the p-values
+    print pvalues.to_string()
+
+
+if __name__ == "__main__":
+    try:
+        (opts, args) = getopt.getopt(sys.argv[1:], "hlc:s:t:p:")
+    except getopt.GetoptError:
+        usage()
+
+    opt_dict = {}
+    for (flag, data) in opts:
+        opt_dict[flag] = data
+
+    if opt_dict.has_key("-h"):
+        usage()
+        sys.exit(1)
+
+    if opt_dict.has_key("-l"):
+        print ','.join(AVAILABLE_STATISTICS)
+        sys.exit(1)
+
+    try:
+        abund_file = args[0]
+        metadata_file = args[1]
+        pathway_file = args[2]
+        output_stats_file = args[3] # where to store the statistics
+    except IndexError:
+        usage()
+
+    exec_go_pipeline(abund_file, metadata_file, pathway_file, 
+                     output_stats_file, opt_dict)
