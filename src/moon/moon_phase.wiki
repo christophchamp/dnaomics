@@ -1,0 +1,44 @@
+Section - C.11 How do I calculate the phase of the moon?
+SOURCE: http://www.faqs.org/faqs/astronomy/faq/part3/section-15.html
+
+John Horton Conway (the Princeton mathematician who is responsible for
+"the Game of Life") wrote a book with Guy and Berlekamp, _Winning
+Ways_, that describes in Volume 2 a number of useful calendrical
+rules.  One of these is an easy "in your head" algorithm for
+calculating the phase of the Moon, good to a day or better depending
+on whether you use his refinements or not.
+
+In the 20th century, calculate the remainder upon dividing the
+last two digits of the year by 19; if greater than 9, subtract
+19 from this to get a number between -9 and 9. 
+
+Multiply the result by 11 and reduce modulo 30 to obtain a
+number between -29 and +29.
+
+Add the day of the month and the number of the month (except
+for Jan and Feb use 3 and 4 for the month number instead of
+1 and 2).
+
+Subtract 4.
+
+Reduce modulo 30 to get a number between 0 and 29. This is
+the age of the Moon.
+
+Example: What was the phase of the Moon on D-Day (June 6,
+1944)?
+
+Answer: 44/19=2 remainder 6.
+
+6*11=66, reduce modulo 30 to get 6.
+
+Add 6+6 to this and subtract 4: 6+6+6-4=14; the Moon was (nearly)
+full. I understand that the planners of D-day did care about the phase
+of the Moon, either because of illumination or because of tides. I
+think that Don Olsen recently discussed this in _Sky and Telescope_
+(within the past several years).
+
+In the 21st century use -8.3 days instead of -4 for the last number.
+
+Conway also gives refinements for the leap year cycle and also
+for the slight variations in the lengths of months; what I have
+given should be good to +/- a day or so.
