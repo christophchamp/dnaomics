@@ -1,0 +1,6 @@
+make
+insmod hello.ko
+dmesg # prints 'printk' messages
+lsmod | grep hello # shows that module is installed
+rmmod # remove module
+dmesg
