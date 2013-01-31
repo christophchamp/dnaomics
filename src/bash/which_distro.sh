@@ -14,6 +14,9 @@
 #  cat /etc/version
 #  cat /etc/issue
 #  cat /etc/issue.net
+#
+# For Ubuntu, the following command should work as well:
+#  lsb_release -a
 # 
 # The following is _normally_ where various distros store the release/version:
 # Annvix: /etc/annvix-release
