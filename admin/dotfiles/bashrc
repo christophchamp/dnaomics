@@ -9,11 +9,25 @@ fi
 test -s ~/.alias && . ~/.alias || true
 
 ## Christoph's additions
+
+# Do not put duplicate lines in the history. See bash(1) for more options
+export HISTCONTROL=ignoredups
+# ... and ignore same sucessive entries.
+export HISTCONTROL=ignoreboth
+export HISTSIZE=1000000
+export HISTFILESIZE=1000000
+shopt -s histappend
+
 export PATH=/home/champ/bin:$PATH
 export VISUAL=vim
 export EDITOR=/usr/bin/vim
 export GIT_EDITOR=/usr/bin/vim
 export SVN_EDITOR=/usr/bin/vim
+export PYTHONWARNINGS="default"
+#export LESS='-R'
+#export LESSOPEN="|~/.lessfilter %s"
+#export LESSCOLORIZER=/usr/bin/pygmentize
+
 #alias lpr='lpr -P Rollright860'
 alias ll='ls -lXhp --color=auto'
 alias lt='ls -lhpXtr --color=auto'
