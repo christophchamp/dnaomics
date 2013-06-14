@@ -24,6 +24,7 @@ export EDITOR=/usr/bin/vim
 export GIT_EDITOR=/usr/bin/vim
 export SVN_EDITOR=/usr/bin/vim
 export PYTHONWARNINGS="default"
+export MTR_OPTIONS=-t  # force ncurses view on mtr
 #export LESS='-R'
 #export LESSOPEN="|~/.lessfilter %s"
 #export LESSCOLORIZER=/usr/bin/pygmentize
