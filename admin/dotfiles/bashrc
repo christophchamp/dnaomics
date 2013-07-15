@@ -44,6 +44,7 @@ alias servethis="python -c 'import SimpleHTTPServer; SimpleHTTPServer.test()'"
 alias pypath='python -c "import sys; print sys.path" | tr "," "\n" | grep -v "egg"'
 alias pycclean='find . -name "*.pyc" -exec rm {} \;'
 alias pymods='python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"'
+alias pysitepkgs='python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"'
 #alias ssh='ssh -R 10999:localhost:22'
 alias nethack='telnet nethack.alt.org'
 alias cmy='mysql -B -N -e'
