@@ -17,6 +17,9 @@ export HISTCONTROL=ignoreboth
 export HISTSIZE=1000000
 export HISTFILESIZE=1000000
 export HISTTIMEFORMAT='%F %T ' # add timestamp to history
+alias h1='history 10'
+alias h2='history 20'
+alias h3='history 30'
 shopt -s histappend
 
 export PATH=/home/champ/bin:$PATH
