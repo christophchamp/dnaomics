@@ -41,6 +41,7 @@ alias shred='shred -xvzu' # Warning! Completey destroys file(s)!
 alias zp='zypper'
 alias psc='ps xawf -eo pid,user,cgroup,args'
 alias t='/home/champ/bin/todo.sh'
+alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
 complete -F _todo t
 # Nifty extras
 alias webshare='python -c "import SimpleHTTPServer;SimpleHTTPServer.test()"'
