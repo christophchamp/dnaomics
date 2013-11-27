@@ -24,7 +24,8 @@ cy = one lightyear in meters = 9.460528412641E+15 meters
 au = one astronomical unit = 1.49597870691E+11 meters
 There are cy/au astronomical units in one lightyear.
 cy/au = 63239.7
-If you use the Julian year instead of the tropical year to calculate the number of meters in a lightyear, then
+If you use the Julian year instead of the tropical year to calculate the number
+of meters in a lightyear, then:
 y = 31557600
 cy = 9.46073047258E+15 meters
 cy/au = 63241.1
