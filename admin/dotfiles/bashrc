@@ -8,7 +8,7 @@ fi
 
 test -s ~/.alias && . ~/.alias || true
 
-## Christoph's additions
+## Christoph Champ's additions
 
 # Do not put duplicate lines in the history. See bash(1) for more options
 export HISTCONTROL=ignoredups
@@ -33,6 +33,7 @@ export MTR_OPTIONS=-t  # force ncurses view on mtr
 #export LESSOPEN="|~/.lessfilter %s"
 #export LESSCOLORIZER=/usr/bin/pygmentize
 
+## ALIASES ##
 #alias lpr='lpr -P Rollright860'
 alias ll='ls -lXhp --color=auto'
 alias lt='ls -lhpXtr --color=auto'
@@ -55,6 +56,10 @@ alias pytasks='grep --exclude-dir=.git -rEI "TODO|FIXME" . 2>/dev/null'
 alias nethack='telnet nethack.alt.org'
 alias cmy='mysql -B -N -e'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
 
+## FUNCTIONS ##
+aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
+function box() { t="$1xxxx";c=${2:-=}; echo ${t//?/$c}; echo "$c $1 $c"; echo ${t//?/$c}; } # aka "bartonski's box"
+
+## PROMPT ##
 PS1='\[\033[0;31m\]\u@newton\[\033[00m\]:\[\033[0;33m\]`pwd`\[\033[00m\]> '
