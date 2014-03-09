@@ -60,6 +60,10 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 ## FUNCTIONS ##
 aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
 function box() { t="$1xxxx";c=${2:-=}; echo ${t//?/$c}; echo "$c $1 $c"; echo ${t//?/$c}; } # aka "bartonski's box"
+function dusage() {
+df -lP|awk '{sum+=$3}END{printf "%d GiB\n", sum/2^20}';
+#df -lP|numsum -3|numprocess /%$(( 2**20 ))/
+}
 
 ## PROMPT ##
 PS1='\[\033[0;31m\]\u@newton\[\033[00m\]:\[\033[0;33m\]`pwd`\[\033[00m\]> '
