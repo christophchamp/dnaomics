@@ -26,6 +26,8 @@
 
 ## Author
 
-Christoph Champ <christoph -dot- champ -at- gmail.com>
+Christoph Champ (<christoph(dot)champ(at)gmail(dot)com>)
+
 http://www.christophchamp.com
+
 Last update: 2014-07-25
