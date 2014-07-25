@@ -26,6 +26,6 @@
 
 ## Author
 
-Christoph Champ
-http://www.christophchamp.com
+Christoph Champ<br/>
+http://www.christophchamp.com<br/>
 Last update: 2014-07-25
