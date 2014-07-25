@@ -1,6 +1,4 @@
-                                   dnaomics
-
-                       a set of bioinformatics utilities
+#dnaomics>a set of bioinformatics utilities
 
 
 SOURCE CODE:
@@ -27,4 +25,4 @@ VERSION SCHEMA:
 
 Author: Christoph Champ <christoph.champ@gmail.com>
 Author website: http://www.christophchamp.com
-Last update: 2013-02-01
+Last update: 2014-07-25
