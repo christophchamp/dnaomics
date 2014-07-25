@@ -2,14 +2,14 @@
 > a set of bioinformatics utilities
 
 
-SOURCE CODE:
+## Source code
 
       Web interface:
           https://github.com/christophchamp/dnaomics
       Checkout:
           git clone git@github.com:christophchamp/dnaomics.git dnaomics
 
-VERSION SCHEMA:
+## Version schema
 
       Standard releases:
 
@@ -24,6 +24,8 @@ VERSION SCHEMA:
 
          <major>.<minor>-rc<N>
 
-Author: Christoph Champ <christoph.champ@gmail.com>
-Author website: http://www.christophchamp.com
+## Author
+
+Christoph Champ <christoph -dot- champ -at- gmail.com>
+http://www.christophchamp.com
 Last update: 2014-07-25
