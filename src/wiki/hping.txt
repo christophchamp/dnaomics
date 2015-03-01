@@ -1,0 +1,10 @@
+* Sending a file over icmp with hping
+
+you need to start a listening hping on the reciever:
+
+ hping3 --listen 10.0.2.254 -I eth0 --sign MSGID1
+
+then you can send your file:
+
+ hping3 10.0.2.254 --icmp --sign MSGID1 -d 50 -c 1 --file a_file
+

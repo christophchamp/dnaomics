@@ -1,0 +1,2 @@
+whois -h v4-peer.whois.cymru.com "50.116.49.49"
+http://bgp.he.net/

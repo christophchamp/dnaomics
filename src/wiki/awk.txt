@@ -1,0 +1,4 @@
+echo "fffff"|awk '{gsub("f", "b")}1'
+echo "fffff"|awk '{gsub(/f/, "b")}1'
+echo "thanks in advance"|awk '{f="k";sub('f', "B")}1' # thanBs in advance
+echo "fffff"|awk '{gsub(//, "b")}1' # fbfbfbfbfb

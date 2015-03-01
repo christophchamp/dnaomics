@@ -1,0 +1,8 @@
+* Make a file/directory immutable (not even root can delete it):
+ lsattr filename
+ chattr +i filename # set
+ chattr -i filename # clear
+
+==External links==
+* http://www.jpeek.com/articles/linuxmag/2008-07/
+

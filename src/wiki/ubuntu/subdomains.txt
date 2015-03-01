@@ -1,0 +1,64 @@
+==Creating subdomains in localhost on Ubuntu==
+SOURCE: http://thinkingnectar.com/2008/getting-ubuntu-to-work-creating-subdomain-in-localhost/
+
+Creating subdomain(s) in any web development environment is essential. For
+example, I have 2 projects going on at the same time and developement is
+concurrent. And subdomains were not created. So we have this scenario:
+
+ http://localhost/alphaproject/
+ http://localhost/betaproject/
+ http://localhost/phpmyadmin/
+
+As you can see, I am assuming a Apache/PHP/MySql developemnt stack. 3 localhost
+urls that will be frequently accessed. Imagine what will happen when you want
+to access beta project? You "control+t" a new browser tab, and type in 
+"localhost" only to have the url bar showing its history of the above 3 urls.
+Then you press the down arrow key to access the required url.
+
+Waste of keystroke I will say. Now we create subdomains and we have:
+
+ http://alphaproject.localhost/
+ http://betaproject.localhost/
+ http://phpmyadmin.localhost/
+
+So now when we want to access beta project? Type in "beta" and simply selected
+the required "remembered" url. Save some keystrokes and it will save up a
+sizable amount of effort over time.
+
+So how to create subdomain in Ubuntu?
+
+Edit /etc/host and add the following line
+
+ 127.0.0.1 alphaproject.localhost
+
+Create a new configuration file at
+ /etc/apache2/sites-available/alphaproject
+
+In this configuration file, have the following:
+
+    <VirtualHost *>
+        DocumentRoot /home/username/alphaproject/
+        ServerName alphaproject.localhost
+
+        <Directory /home/username/alphaproject/>
+            Options Indexes FollowSymLinks MultiViews +Includes
+            AllowOverride None
+            Order allow,deny
+            allow from all
+        </Directory>
+    </VirtualHost>
+
+Save the file, and run the following:
+
+ sudo a2ensite alphaproject
+
+Finally restart the Apache Server (assuming you are using Apache2)
+
+ sudo /etc/init.d/apache2 restart
+
+And by going to http://alphaproject.localhost/ you should be able to access
+your newly created subdomain.
+
+PS: phpmyadmin does come installed as a package but default to http://localhost/pma which I do strongly encourage users to change it to http://pma.localhost/
+
+Think of the key strokes you be saving. And yes, do name your subdomain smartly, try picking each subdomain to have a different starting character.

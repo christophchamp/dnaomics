@@ -1,0 +1,1 @@
+play -n synth sine 480 sine 620 remix 1-2 fade 0 0.5 delay 0.5 repeat 5

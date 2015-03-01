@@ -1,0 +1,34 @@
+Setup a logon banner for ssh clients to see when they login 
+SOURCE: http://advancelinux.blogspot.com/2012/03/setup-logon-banner-for-ssh-clients-to.html
+1. Create a banner file. (e.g. /etc/banner) using vi editor.
+# vi /etc/banner
+
+**********************************
+******** WELCOME TO REDHAT *******
+**********************************
+
+Configure the ssh configuration file  /etc/ssh/sshd_config file and add the line Banner /etc/banner  to it.
+
+# vi /etc/ssh/sshd_config
+Banner /etc/banner
+
+Restart sshd daemon for the changes to take effect
+
+# service sshd restart
+Example
+If we are accessing server using ssh , message will appear as follows:
+
+[root@mail ~]# ssh 10.30.32.206
+
+**********************************
+*********WELCOME TO REDHAT********
+**********************************
+root@10.30.32.206's password:
+
+======
+
+http://superuser.com/questions/98562/way-to-avoid-ssh-connection-timeout-freezing-of-terminal-tab
+
+mussh -h 192.168.100.{1..50} -m -t 10 -c uptime
+
+touch /root/.ssh/known_hosts; grep -w '10.13.63.47' /root/.ssh/known_hosts || /usr/bin/ssh-keyscan -trsa 10.13.63.47 >> /root/.ssh/known_hosts

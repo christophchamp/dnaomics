@@ -1,0 +1,9 @@
+http://superuser.com/questions/348756/creating-stereo-file-from-two-mono-files-with-sox?rq=1
+
+* Record from laptop built-in mic
+rec foo.aiff
+rec -c 2 radio.aiff trim 0 30:00
+
+* Get mp3's to work with `play`:
+ $ lame --decode music.mp3 - | play -
+ $ sudo apt-get install libsox-fmt-mp3

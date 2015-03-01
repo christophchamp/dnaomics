@@ -1,0 +1,4 @@
+complete -p|less
+
+# SEE: http://www.debian-administration.org/articles/316
+# http://www.debian-administration.org/article/317/An_introduction_to_bash_completion_part_2

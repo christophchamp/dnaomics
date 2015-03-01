@@ -1,0 +1,247 @@
+<tt>bc</bc> is an arbitrary precision calculator language. This article describes the GNU bc implementation.
+
+==Examples==
+* Print the sequence of numbers 1 to 255 in hexidecimal
+for i in `seq 255`; do echo "obase=16;$i" |bc -l; done
+
+==TODO==
+ Most of these examples follow a simple formula.
+addition
+
+$ echo '57+43' | bc
+
+100
+
+subtraction
+
+$ echo '57-43' | bc
+
+14
+
+multiplication
+
+$ echo '57*43' | bc
+
+2451
+
+scale
+
+The scale variable determines the number of digits which follow the decimal point in your result. By default, the value of the scale variable is zero. (Unless you use the -l option in which case it defaults to 20 decimal places. More about -l later.) This can be set by declaring scale before your calculation, as in the following division example:
+division
+
+$ echo 'scale=25;57/43' | bc
+
+1.3255813953488372093023255
+
+square root
+
+$ echo 'scale=30;sqrt(2)' | bc
+
+1.414213562373095048801688724209
+
+This beats Google's calculator function which only calculates the result to 8 decimal places! ;-) Although Google's calculator function has this 8 decimal places limitation, it will allow imaginary numbers as answers.
+power
+
+$ echo '6^6' | bc
+
+46656
+
+parentheses
+
+If you have read Robert Heinlein's The Number of the Beast, you may recall that the number of parallel universes in the story equals (six to the power of six) to the power of six. If you should try to calculate that like this:
+
+$ echo '6^6^6' | bc
+
+You will get a screen full of numbers (some 37374 digits), not the
+
+10314424798490535546171949056
+
+that you might expect.
+
+If you're running a non-GNU version of bc, you'll most likely get something like:
+
+exp too big
+empty stack
+save:args
+
+The Google Calculator balks at '6^6^6' as well. Good ol' GNU.
+
+That's because you typed the wrong question. You need to type:
+
+$ echo '(6^6)^6' | bc
+
+Whereas what you did type was interpreted as:
+
+$ echo '6^(6^6)' | bc
+
+which is an entirely different number altogether. So the positioning of parentheses (brackets to you and me!) is very important. I use brackets to separate the different components of my sums whenever possible, just eliminate any possible doubt that I may get the wrong answer. Consider the following calculations:
+
+$ echo '7+(6*5)' | bc
+
+$ echo '7+6*5' | bc
+
+$ echo '6*5+7' | bc
+
+They all give the same answer, 37, but I would have typed the first calculation, unless of course, I meant:
+
+$ echo '(7+6)*5' | bc
+
+Or to put it another way:
+
+$ echo '13*5' | bc
+
+which is 65.
+obase and ibase
+
+obase and ibase are special variables which define output and input base.
+
+Legitimate obase values range from 2 to 999, although anything beyond 16 is wasted on me!
+
+Legitimate ibase values range from 2 to 16.
+
+Some examples will explain all this better.
+convert from decimal to hexadecimal
+
+Here we're converting 255 from base 10 to base 16:
+
+$ echo 'obase=16;255' | bc
+
+FF
+
+convert from decimal to binary
+
+And here we're converting the number 12 from base 10 to base 2:
+
+$ echo 'obase=2;12' | bc
+
+1100
+
+Which reminds me of the old joke:
+
+There are only 10 types of people in the world -- those who understand binary, and those who don't.
+
+Which leads us neatly onto the next example:
+convert from binary to decimal
+
+Here we're converting the binary number 10 to a base 10 (decimal) number.
+
+$ echo 'ibase=2;obase=A;10' | bc
+
+2
+
+Note that the obase is "A" and not "10". Sorry, you've got to learn some hex. The reason for this is you've set the ibase to "2", so if you now had tried to use "10" as the value for the obase, it would stay as "2", because "10" in base 2 is "2". So you need to use hex to "break out" of binary mode.
+
+Well, that was just to explain the joke; now something a bit more challenging:
+
+$ echo 'ibase=2;obase=A;10000001' | bc
+
+129
+
+convert from hexadecimal to decimal
+
+$ echo 'ibase=16;obase=A;FF' | bc
+
+255
+
+Again, note the use of "A" to denote base 10. That is because "10" in hex (base 16 - the ibase value) is 16.
+a brief introduction to interactive mode
+
+You can also run bc in interactive mode:
+
+$ bc
+
+If you're running GNU bc, you should get the following notice:
+
+bc 1.06
+Copyright 1991-1994, 1997, 1998, 2000 Free Software Foundation, Inc.
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type `warranty'.
+
+Followed by an uninviting blank prompt. Otherwise you'll just get an uninviting blank prompt.
+
+If you wish to get straight to the uninviting blank prompt, use the -q option, which runs bc in quiet mode, preventing the normal GNU bc welcome from being printed:
+
+$ bc -q
+
+Using the basics we've been through from the examples above, enter a calculation:
+
+scale=5
+57/43
+1.32558
+
+Type quit to exit bc interactive mode.
+using bc with shell scripts
+
+You can use shell variables with bc, which is very useful in shell scripts:
+
+$ FIVE=5 ; echo "$FIVE^2" | bc
+
+25
+
+Note the use of double-quotes to preserve the value of the variable $FIVE.
+a brief introduction to using bc with files
+
+Using bc with files allows complex calculations to be repeated, again and again, a bit like using a spreadsheet to run the same calculations on changing figures ... but faster.
+
+Here is a simple example:
+
+scale=2
+
+/* C-style comments
+   are allowed, as are spaces */
+
+print "\nConvert Fahrenheit to Celsius\n\n"
+print "Temperature in Fahrenheit: " ; fah = read()
+print "\n"
+print "Equivalent Temperature in Celsius is: "
+(fah - 32.0) * 5.0 / 9.0
+quit
+
+Create and save the file, then run it like this:
+
+$ bc -q filename
+
+Convert Fahrenheit to Celsius
+
+Temperature in Fahrenheit: 61
+
+Equivalent Temperature in Celsius is: 16.11
+
+Note that this example has only been tested with GNU bc. Other (proprietary) versions of bc may have more stringent syntax requirements. Some bcs don't allow the use of print or read, for example, so you have to edit your file before each calculation. Not very useful.
+a quick challenge for your PC (GNU bc only)
+
+If you wish to test the comparative speed of your PC, try this challenge: use bc to calculate Pi to 5000 decimal places. The idea for this challenge came from a great article at Geekronomicon.
+
+If you really want to tie up your machine for an hour (or more), you could try the "Pi to 25000 decimal places" challenge from the aforementioned Geekronomicon. ;-)
+
+First, to put things in perspective, here is some information about my CPU:
+
+$ cat /proc/cpuinfo | egrep "model name|MHz"
+
+model name      : AMD Athlon(tm) 64 Processor 3500+
+cpu MHz         : 2211.346
+
+Note the use (below) of the command bc -l -q.
+-l loads the math library which is required for the use of the "a" (arctangent) in the calculation for Pi. You can learn more about the math library functions in the bc command manual.
+I'm not sure what effect the -q option (quiet, no welcome message printed) has on our test, but I guess it can't harm.
+
+$ time echo "scale=5000; 4*a(1)" | bc -l -q
+
+3.141592653589793238462643383279502884197169399375105820974944592307\
+...
+...
+...
+73774418426312986080998886874132604720
+
+real    0m44.164s
+user    0m44.099s
+sys     0m0.008s
+
+44.099 seconds! Not bad. :-) I imagine that some Gentoo folks may be interested to see what difference their compile-time optimisations make to the speed of bc. FWIW, my distro of choice is Arch Linux.
+
+TODO#2: http://www.linuxjournal.com/article/2544
+
+==External links==
+* [http://www.gnu.org/software/bc/manual/bc.html GNU bc manual]
+
+[[Category:Linux Command Line Tools]]

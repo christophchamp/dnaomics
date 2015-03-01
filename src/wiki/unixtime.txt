@@ -1,0 +1,43 @@
+ >>> from datetime import datetime
+ >>> d = datetime.utcnow()
+ >>> d
+ datetime.datetime(2011, 7, 21, 3, 13, 22, 259901)
+
+So here is the snippet that I use to convert datetime to timestamp:
+ >>> import calendar
+ >>> calendar.timegm(d.utctimetuple())
+ 1311218002
+
+Verify:
+ $ date -ud @1311218002
+ Thu Jul 21 03:13:22 UTC 2011
+
+-----
+Default datetime objects are said to be "naive": they keep time information without the TimeZone. Think about naive datetime as a relative number (ie: +4) without a clear origin (in fact your origin will be common throughout your system boundary). Think about aware datetime as absolute numbers (ie: 8) with a common origin for the whole world.
+
+Without timezone information YOU CANNOT convert the "naive" datetime towards any non-naive time representation (where does +4 targets if we don't know from where to start ?). This is why you can't have a datetime.datetime.toutctimestamp() method. (cf: http://bugs.python.org/issue1457227)
+
+Hopefully, it is quite easy to guess the timezone (your local origin) when you create your naive datetime object as it is related to the system configuration that you would hopefully NOT change between the naive datetime object creation and the moment when you want to get the UTC timestamp. This trick can be used to answer your question.
+
+By using ''time.mktime'' we can create an utc_mktime
+
+def utc_mktime(utc_tuple):
+    """Returns number of seconds elapsed since epoch
+
+    Note that no timezone are taken into consideration.
+
+    utc tuple must be: (year, month, day, hour, minute, second)
+
+    """
+
+    if len(utc_tuple) == 6:
+        utc_tuple += (0, 0, 0)
+    return time.mktime(utc_tuple) - time.mktime((1970, 1, 1, 0, 0, 0, 0, 0, 0))
+
+def datetime_to_timestamp(dt):
+    """Converts a datetime object to UTC timestamp"""
+
+    return int(utc_mktime(dt.timetuple()))
+
+You must make sure that your datetime.datetime object is created on the same timezone than the one that has created your datetime. This constraint is very often verified. But nasty corner case could happen, so be carefull.
+

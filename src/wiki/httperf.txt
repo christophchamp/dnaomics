@@ -1,0 +1,5 @@
+httperf --hog --server www.marcxtof.com
+httperf --hog --server www.marcxtof.com --num-conn 100 --ra 10 --timeout 5
+
+==External links==
+* [http://www.hpl.hp.com/research/linux/httperf/ Official website]

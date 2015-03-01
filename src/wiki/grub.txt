@@ -1,0 +1,28 @@
+After upgrading from 12.10 to 13.04, the login screen is black because brightness is set to lowest level (Intel Integrated Graphics)
+
+I've noticed that it would be a brightness problem cause I've listened to the Ubuntu's default drum sound when booting for the first time after upgrading. Before I find this solution, I had to increase the brightness level to see anything on the screen.
+
+For me, the solution came from this bug report at https://bugs.launchpad.net/ubuntu/+source/xserver-xorg-video-intel/+bug/1173059, by changing /etc/default/grub as root this way:
+
+Make a backup file, so you'll be able to restore it, if this solution doesn't work:
+
+sudo cp /etc/default/grub /etc/default/grub.original
+
+To open the file with sudo you can use this in the Terminal, for example:
+
+sudo gedit /etc/default/grub
+
+Then, replace:
+
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+
+to
+
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash acpi_osi=Linux acpi_backlight=vendor"
+
+You'll need to run update-grub2 to apply the change:
+
+sudo update-grub2
+
+That's it. After rebooting, it worked flawlessly for me (that is, my login screen has a normal brightness level).
+

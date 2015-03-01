@@ -1,0 +1,18 @@
+'''update-rc.d''' is a utility used to install and remove System-V style init script links.
+
+==Example==
+It is also important that nova-agent gets started in the boot process before the xe-linux-distribution utility is started. You can check that this is the case with the following command:
+
+$ ls -l /etc/rc0.d/
+
+If "nova-agent" is listed _before_ "xe-linux-distribution" in the list returned, then everything is okay. If it is not, then you will need to move it up in the boot initialization process.
+
+Below is an example (note that the "20" might need to be change. You are trying to make that number lower than the number associated with "xe-linux-distribution". For an example, if xe-linux-distribution has "K86ex-linux-distribution", then we can use "20" for nova-agent because 20 < 86):
+
+$ sudo update-rc.d -f nova-agent remove
+$ sudo update-rc.d nova-agent defaults 20
+
+==External links==
+* [http://manpages.ubuntu.com/manpages/hardy/man8/update-rc.d.8.html update-rc.d man page]
+* [http://upstart.ubuntu.com/cookbook/ Upstart Intro, Cookbook, and Best Practices]
+* [http://www.debuntu.org/how-to-managing-services-with-update-rc-d/]

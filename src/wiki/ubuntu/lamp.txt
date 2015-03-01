@@ -1,0 +1,11 @@
+sudo apt-get install lamp-server^
+# Installs:
+apache2 — actually Apache web server
+php5-common — PHP5 interpreter
+libapache2-mod-php5 — PHP5 module for Apache
+mysql-server-5.1 — Mysql 5.1 server
+php5-mysql — Mysql libraries for PHP5
+and many other packages...
+
+after the above finishes, execute
+ service apache2 start

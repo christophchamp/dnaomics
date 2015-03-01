@@ -1,0 +1,21 @@
+EXAMPLES
+       nmcli -t -f RUNNING nm
+
+              tells you whether NetworkManager is running or not.
+
+       nmcli -t -f STATE nm
+
+              shows the overall status of NetworkManager.
+
+       nmcli nm wifi off
+
+              switches Wi‐Fi off.
+
+       nmcli -p con list
+
+              lists all connections NetworkManager has.
+etc. (see man page)
+
+==See also==
+*[[nm-tool]]
+

@@ -1,0 +1,6 @@
+* Check if Apache is running on a remote server
+ telnet marcxtof.com 80
+ > HEAD / HEAD/1.0  # Press Enter twice
+
+NOTE: This is the same information returned by
+ curl --head http://www.marcxtof.com

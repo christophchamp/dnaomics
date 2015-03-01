@@ -1,0 +1,1 @@
+sudo tune2fs -l /dev/xvda1| awk '/Filesystem UUID/ {print $3}'

@@ -1,0 +1,2 @@
+http://en.wikipedia.org/wiki/Sparse_file
+https://wiki.archlinux.org/index.php/Sparse_file

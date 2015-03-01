@@ -1,0 +1,4 @@
+pngcrush -rem alla -brute -reduce infile.png outfile.png
+pngcrush -rem alla -brute -reduce -q infile.png outfile.png # quiet
+jpegtran -outfile outfile.jpg -optimise -progressive infile.jpg
+pngnq -n 256 infile.png

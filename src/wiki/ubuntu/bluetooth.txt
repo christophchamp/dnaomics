@@ -1,0 +1,12 @@
+* Add the following line to the <code>/etc/rc.local</code> file (before the "<code>exit 0</code>" line:
+ rfkill block bluetooth
+
+ $ rfkill help
+ $ rfkill list
+ $ rfkill event
+ $ rfkill block <index>|<type>
+ $ rfkill unblock <index>|<type>
+
+==External links==
+* [http://wireless.kernel.org/en/users/Documentation/rfkill rfkill - Linux Wireless]
+* [http://catlingmindswipe.blogspot.com/2012/05/how-to-disable-bluetooth-on-startup.html How to disable bluetooth on startup]

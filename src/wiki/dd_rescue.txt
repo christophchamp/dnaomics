@@ -1,0 +1,18 @@
+
+* Clone a whole partition or hard drive to a sparse file (saving to an xHDD, in this case):
+ $ dd_rescue -a -b 8M /dev/sda1 /mnt/xhdd/sda1.raw
+ # ~OR~
+ $ ddrescue -S -b8M /dev/sda1 /mnt/xhdd/sda1.raw
+ # ~OR with long option:
+ $ ddrescue --sparse --block-size 8M /dev/sda1 /mnt/xhdd/sda1.raw
+ # ~OR if you prefer MiBs:
+ $ ddrescue -S -b8Mi /dev/sda1 /mnt/xhdd/sda1.raw
+
+Note that you can stop the copy at any time with Ctrl-C. It will show you your current position, and you can use that value to restart by adding -s and the position to the original command, like so:
+ $ dd_rescue -a -b 8M -s 42000k /dev/sda1 /mnt/xhdd/sda1.raw
+
+Note that GNU ddrescue and dd_rescue are different programs. But GNU ddrescue seems to be more widespread.
+
+==See also==
+* myrescue - rescue data from damaged harddisks
+* gddrescue - GNU data recovery tool

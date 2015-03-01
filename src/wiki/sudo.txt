@@ -1,0 +1,9 @@
+==Change default editor==
+Ubuntu and Debian use the alternatives system to maintain the symbolic links for programs. For example, when you first run visudo after a fresh installation of Ubuntu, it will prompt a list of editors for you to choose from. Unfortunately, it doesn't tell you how to change that setting again. The mostly happend situation is: you set it to "nano" at first, and want to change it to "vi" at a later time.
+
+Here is the command to bring up that list again:
+
+sudo update-alternatives --config editor
+
+Some people suggest using command EDITOR=vi visudo, or export EDITOR=vi; visudo. They both works, but it's really annoying that you have to remember and type so many letters everytime you run this command.
+

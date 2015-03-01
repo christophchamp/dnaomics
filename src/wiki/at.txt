@@ -1,0 +1,4 @@
+at 3:30 tomorrow
+at>clamscan -i /home/user | mail user@example.com
+at> <CTRL-D> 
+job 3 at 2005-04-28 03:30

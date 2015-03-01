@@ -1,0 +1,14 @@
+==Keyword search==
+keyword	location	description
+g	http://www.google.com/search?q=%s	Google Web search
+gs	http://www.google.com/search?q=site%3A%s	Google site:
+gl	http://www.google.com/search?q=link%3A%s	Google link:
+s	http://scholar.google.com/scholar?q=%s	Google Scholar
+img	http://images.google.com/images?safe=off&q=%s	Google Images search (1)
+usenet	http://groups.google.com/groups?q=%s	Google Groups search
+id	http://groups.google.com/groups?selm=%s&output=gplain	Google Groups search (2)
+f	http://froogle.google.com/froogle?q=%s&scoring=p	Froogle (3)
+dict	http://dictionary.reference.com/search?q=%s	Dictionary
+wiki	http://en.wikipedia.org/wiki/Special:Search?search=%s	Wikipedia
+cpan	http://search.cpan.org/search?mode=all&query=%s	CPAN
+fm	http://freshmeat.net/search/?mode=all&q=%s	Freshmea

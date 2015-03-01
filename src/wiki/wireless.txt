@@ -1,0 +1,29 @@
+# systemctl stop NetworkManager.service
+# systemctl stop network.service
+# killall -TERM wpa_supplicant
+# killall -TERM dhclient
+# ip link set wlan0 down
+# modprobe -r ath5k
+
+# dmesg -C
+
+# modprobe ath5k debug=0x23
+# ip link set wlan0 up
+# wpa_supplicant -B -Dwext -i wlan0 -c /root/my_wpa_supplicant.conf
+# dhclient -v wlan0
+
+# lspci -vvvnn
+# ip link set wlan%d up
+# iwconfig wlan%d essid any
+
+sudo /usr/sbin/iwconfig wlan0 power off
+
+In any case, a reboot should not be necessary. If you do
+
+sudo /sbin/modprobe -rv ath9k
+sudo /sbin/modprobe -v ath9k
+
+the network should restart.
+iwconfig wlan0 rate 54M
+
+/etc/sysconfig/network/ifcfg-ath0 # WIRELESS_AP='off'

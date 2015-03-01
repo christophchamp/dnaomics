@@ -1,0 +1,9 @@
+
+* Change the default character set for HTML
+In an .htaccess file placed in the directory you want to have the character set changed on, include the following lines:
+ AddDefaultCharset ?
+ # Or AddType 'text/html; charset=?' html
+ DefaultLanguage en-US
+
+==External links==
+* [http://www.htaccess-guide.com/how-to-use-htaccess/ Apache .htaccess Guide]

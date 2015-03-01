@@ -1,0 +1,535 @@
+http://kb.cyberoam.com/?id=60
+http://danielmiessler.com/study/tcpdump/
+http://terminallinux.org/p/69/
+https://one.rackspace.com/display/~michael.quintero/tcpdump+-+quick+guide
+http://www.tldp.org/HOWTO/Linux%2BIPv6-HOWTO/examples-tcpdump.html
+http://ask.wireshark.org/questions/13593/is-it-possible-to-capture-tcpdump-logging-and-import-into-wireshark
+http://www.alexonlinux.com/tcpdump-for-dummies
+
+Tcpdump prints out a description of the contents of packets on a network
+interface that match the boolean expression. It can also be run with
+the -w flag, which causes it to save the packet data to a file for later
+analysis, and/or with the -r flag, which causes it to read from a saved
+packet file rather than to read packets from a network interface.
+
+In all cases, only packets that match expression will be processed
+by tcpdump.
+
+Tcpdump will, if not run with the -c flag, continue capturing packets
+until it is interrupted by a SIGINT signal (generated, for example, by
+typing your interrupt character, typically control-C) or a SIGTERM signal
+(typically generated with the kill(1) command); if run with the -c flag,
+it will capture packets until it is interrupted by a SIGINT or SIGTERM
+signal or the specified number of packets have been processed.
+
+When tcpdump finishes capturing packets, it will report counts of: packets
+``captured'' (this is the number of packets that tcpdump has received
+and processed); packets ``received by filter'' (the meaning of this
+depends on the OS on which you're running tcpdump, and possibly on the way
+the OS was configured - if a filter was specified on the command line,
+on some OSes it counts packets regardless of whether they were matched
+by the filter expression and, even if they were matched by the filter
+expression, regardless of whether tcpdump has read and processed them
+yet, on other OSes it counts only packets that were matched by the filter
+expression regardless of whether tcpdump has read and processed them
+yet, and on other OSes it counts only packets that were matched by the
+filter expression and were processed by tcpdump); packets ``dropped by
+kernel'' (this is the number of packets that were dropped, due to a lack
+of buffer space, by the packet capture mechanism in the OS on which
+tcpdump is running, if the OS reports that information to applications;
+if not, it will be reported as 0).
+
+On platforms that support the SIGINFO signal, such as most BSDs
+(including Mac OS X) and Digital/Tru64 UNIX, it will report those
+counts when it receives a SIGINFO signal (generated, for example,
+by typing your ``status'' character, typically control-T, although on
+some platforms, such as Mac OS X, the ``status'' character is not
+set by default, so you must set it with stty(1) in order to use it)
+and will continue capturing packets.
+
+Reading packets from a network interface may require that you have special
+privileges; see the pcap (3PCAP) man page for details. Reading a saved
+packet file doesn't require special privileges [See which interfaces
+can capture packets]
+
+tcpdump -D
+
+[Capture packets from a particular interface]
+
+tcpdump -i eth0
+
+[Capture packets and write to a file]
+
+tcpdump -w readmein_wireshark.pcap -i eth0
+
+[Capture packets with IP Address]
+
+tcpdump -n -i eth0
+
+[Reading packets from a file]
+
+tcpdump -tttt -r data.pcap
+
+----- What do the -t+ flags do you ask?
+
+    -t   Don't print a timestamp on each dump line.
+
+    -tt  Print an unformatted timestamp on each dump line.
+
+    -ttt  Print a delta (micro-second resolution) between current
+    and previous line on each dump line.
+
+    -tttt Print a timestamp in default format proceeded by date on
+    each dump line.
+
+    -ttttt Print a delta (micro-second resolution) between current
+    and first line on each dump line.
+
+--------------------------------------------------------------
+
+[Read packets longer/lesser then ....]
+
+tcpdump -w great1024.pcap greater 1024
+
+tcpdump -w less1024.pcap less 1024
+
+[Monitor all traffic except my ssh traffic] tcpdump -i eth1 port not 22
+[Monitor all traffic except... ((multiple))] tcpdump -i eth1 port not
+22 not 53 not 110 not 25 and host 192.168.1.1
+
+[tcpdump on specific port]
+
+tcpdump -i eth0 port 22 tcpdump -i eth0 icmp [Capture communication
+between two hosts] tcpdump -w comm.pcap -i eth0 dst 16.181.170.246 and
+port 22 [Filter Packets] Example using arp and not arp tcpdump -i eth0
+not arp and not rarp
+
+[Show all URG packets]
+
+tcpdump 'tcp[13] & 32 != 0'
+
+[Show all ACK packets]
+
+tcpdump 'tcp[13] & 16 != 0'
+
+[Show all PSH packets]
+
+tcpdump 'tcp[13] & 8 != 0'
+
+[Show all RST packets]
+
+tcpdump 'tcp[13] & 4 != 0'
+
+[Show all SYN packets]
+
+tcpdump 'tcp[13] & 2 != 0'
+
+[Show all FIN packets]
+
+tcpdump 'tcp[13] & 1 != 0'
+
+[Show all SYN-ACK packets] tcpdump 'tcp[13] = 18'
+
+[specify the IP, the port and in the same time I want to see the packets
+in ASCII]
+
+tcpdump -nvi lo host www.host.com and port 9999 -A
+
+[Display captured packets in HEX and Ascii]
+
+tcpdump -XX -i eth0
+
+ ----------------------------------------------------------
+
+Tcpdump Recipes
+
+host, src, dst, net, proto, port
+
+This are the most common used tcpdump recipes
+
+host – specify the host address like host www.google.com will monitor
+only packets coming from or to www.google.com
+
+src – specify the source ip that you are monitoring i.e tcpdump -nnvvi
+eth0 tcp src 192.168.0.15 (local green IP)
+
+dst – specify the destination ip address that you want to monitor
+
+net – capture the entire traffic of a network using CIDR like tcpdump
+-nnvvi eth0 net 192.168.0.1/24 will capture any packet send from or to
+IP-s in the /24 range, in this case from 192.168.0.1 min to 192.168.0.254
+max.
+
+proto – is the example above for specifying the protocol (icmp, tcp
+or udp) but don’t type it you just have to type tcpdump -nnvvi eth0 udp
+
+port – with this we can specify the port we want to monitor and the
+port option have 2 more sub-options , src and dst.
+
+--------------------------------------------------------
+
+Anatomy of a Tcpdump command
+
+Packet capture is one of the most fundamental and powerful ways to
+do network analysis. You can learn virtually anything about what is
+going on within a network by intercepting and examining the raw data
+that crosses it. Modern network analysis tools are able to capture,
+interpret and describe this network traffic in a human-friendly manner.
+
+tcpdump is one of the original packet capture (or "sniffing") tools that
+provide these analysis capabilities, and even though it now shares the
+field with many other utilities, it remains one of the most powerful
+and flexible.
+
+If you think that tcpdump has been made obsolete by GUI tools like
+Wireshark, think again. Wireshark is a great application; it's just
+not the right tool for the job in every situation. As a refined,
+universal, lightweight command-line utility—much like cat, less and
+hexdump—tcpdump satisfies a different type of need.
+
+One of tcpdump's greatest strengths is its convenience. It uses a
+"one-off-command" approach that lends itself to quick, on-the-spot
+answers. It works through an SSH session, doesn't need X and is more
+likely to be there when you need it. And, because it uses standard
+command-line conventions (such as writing to STDOUT, which can be
+redirected), tcpdump can be used in all sorts of creative, interesting
+and extremely useful ways.
+
+In this article, I introduce some of the basics of packet capture
+and provide a breakdown of tcpdump syntax and usage. I show how to use
+tcpdump to zero in on specific packets and reveal the useful information
+they contain. I provide some real-world examples of how tcpdump can help
+put the details of what's happening on your network at your fingertips,
+and why tcpdump is still a must-have in any admin's toolbox. Essential
+Concepts
+
+Before you can begin to master tcpdump, you should understand some of
+the fundamentals that apply to using all packet sniffers:
+
+  Packet capturing is passive—it doesn't transmit or alter network
+  traffic.
+
+  You can capture only the packets that your system receives. On a
+  typical switched network, that excludes unicast traffic between
+  other hosts (packets not sent to or from your machine).
+
+  You can capture only packets addressed to your system, unless the
+  network interface is in promiscuous mode.
+
+It is assumed that you're interested in seeing more than just your
+local traffic, so tcpdump turns on promiscuous mode automatically (which
+requires root privileges). But, in order for your network card to receive
+the packets in the first place, you still have to be where the traffic
+is, so to speak. Anatomy of a tcpdump Command
+
+A tcpdump command consists of two parts: a set of options followed by
+a filter expression (Figure 1). tcpdump -i eth1 -vvn icmp or udp (where
+
+Figure 1. Example tcpdump Command
+
+The expression identifies which packets to capture, and the options
+define, in part, how those packets are displayed as well as other aspects
+of program behavior. Options
+
+tcpdump options follow the standard command-line flag/switch syntax
+conventions. Some flags accept a parameter, such as -i to specify the
+capture interface, while others are standalone switches and can be
+clustered, such as -v to increase verbosity and -n to turn off name
+resolution.
+
+The man page for tcpdump lists all available options, but here are a
+few of the noteworthy ones:
+
+  -i interface: interface to listen on.
+
+  -v, -vv, -vvv: more verbose.
+
+  -q: less verbose.
+
+  -e: print link-level (Ethernet) headers.
+
+  -N: display relative hostnames.
+
+  -t: don't print timestamps.
+
+  -n: disable name lookups.
+
+  -s0 (or -s 0): use the max "snaplen"—capture full packets (default
+  in recent versions of tcpdump).
+
+None of these are required. User-supplied options simply modify the
+default program behavior, which is to capture from the first interface,
+and then print descriptions of matching packets on the screen in a
+single-line format. Filter Expression
+
+The filter expression is the Boolean (true or false) criteria for
+"matching" packets. All packets that do not match the expression are
+ignored.
+
+The filter expression syntax is robust and flexible. It consists primarily
+of keywords called primitives, which represent various packet-matching
+qualifiers, such as protocol, address, port and direction. These can
+be chained together with and/or, grouped and nested with parentheses,
+and negated with not to achieve virtually any criteria.
+
+Because the primitives have friendly names and do a lot of the heavy
+lifting, filter expressions are generally self-explanatory and easy to
+read and construct. The syntax is fully described in the pcap-filter
+man page, but here are a few example filter expressions:
+
+  tcp
+
+  port 25 and not host 10.0.0.3
+
+  icmp or arp or udp
+
+  vlan 3 and ether src host aa:bb:cc:dd:ee:ff
+
+  arp or udp port 53
+
+  icmp and \(dst host mrorange or dst host mrbrown\)
+
+Like the options, filter expressions are not required. An empty filter
+expression simply matches all packets. Understanding tcpdump Output
+
+How much sense the output makes depends on how well you understand the
+protocols in question. tcpdump tailors its output to match the protocol(s)
+of the given packet.
+
+For example, ARP packets are displayed like this when tcpdump is called
+with -t and -n (timestamps and name lookups turned off):
+
+ arp who-has 10.0.0.1 tell 10.0.0.2 arp reply 10.0.0.1 is-at
+ 00:01:02:03:04:05
+
+ARP is a simple protocol used to resolve IPs into MAC addresses. As
+you can see above, tcpdump describes these packets in a correspondingly
+simple format. DNS packets, on the other hand, are displayed completely
+different:
+
+ IP 10.0.0.2.50435 > 10.0.0.1.53: 19+ A? linuxjournal.com. (34) IP
+ 10.0.0.1.53 > 10.0.0.2.50435: 19 1/0/0 A 76.74.252.198 (50)
+
+This may seem cryptic at first, but it makes more sense when you
+understand how protocol layers work. DNS is a more complicated protocol
+than ARP to begin with, but it also operates on a higher layer. This
+means it runs over top of other lower-level protocols, which also are
+displayed in the output.
+
+Unlike ARP, which is a non-routable, layer-3 protocol, DNS is an
+Internet-wide protocol. It relies on UDP and IP to carry and route it
+across the Internet, which makes it a layer-5 protocol (UDP is layer-4,
+and IP is layer-3).
+
+The underlying UDP/IP information, consisting of the source and
+destination IP/port, is displayed on the left side of the colon, followed
+by the remaining DNS-specific information on the right.
+
+Even though this DNS information still is displayed in a highly condensed
+format, you should be able to recognize the essential elements if you know
+the basics of DNS. The first packet is a query for linuxjournal.com, and
+the second packet is an answer, giving the address 76.74.252.198. These
+are the kind of packets that are generated from simple DNS lookups.
+
+See the "OUTPUT FORMAT" section of the tcpdump man page for complete
+descriptions of all the supported protocol-specific output formats. Some
+protocols are better served than others by their output format, but I've
+found that tcpdump does a pretty good job in general of showing the most
+useful information about a given protocol.
+
+Capture Files
+
+In addition to its normal behavior of printing packet descriptions to
+the screen, tcpdump also supports a mode of operation where it writes
+packets to a file instead. This mode is activated when the -w option is
+used to specify an output capture file.
+
+When writing to a file, tcpdump uses a completely different format from
+when it writes to the screen. When writing to the screen, formatted
+text descriptions of packets are printed. When writing to a file, the
+raw packets are recorded as is, without analysis.
+
+Instead of doing a live capture, tcpdump also can read from an existing
+capture file as input with the -r option. Because tcpdump capture files
+use the universally supported "pcap" format, they also can be opened by
+other applications, including Wireshark.
+
+This gives you the option to capture packets with tcpdump on one host,
+but perform analysis on a different host by transferring and loading
+the capture file. This lets you use Wireshark on your local workstation
+without having to attach it to the network and location you need to
+capture from. Analyzing TCP-Based Application Protocols
+
+tcpdump is a packet-based analyzer, and it works great for connectionless,
+packet-based protocols like IP, UDP, DHCP, DNS and ICMP. However, it
+cannot directly analyze "connection-oriented" protocols, such as HTTP,
+SMTP and IMAP, because they work completely different.
+
+They do not have the concept of "packets". Instead, they operate
+over the stream-based connections of TCP, which provide an abstracted
+communications layer. These application protocols are really more like
+interactive console programs than packet-based network protocols.
+
+TCP transparently handles all of the underlying details required to
+provide these reliable, end-to-end, session-style connections. This
+includes encapsulating the stream-based data into packets (called
+segments) that can be sent across the network. All of these details are
+hidden below the application layer.
+
+In order to capture TCP-based application protocols, an extra step is
+needed beyond capturing packets. Because each TCP segment is only a
+slice of application data, it can't be used individually to obtain any
+meaningful information. You first must reassemble TCP sessions (or flows)
+from the combined sets of individual segments/packets. The application
+protocol data is contained directly within the sessions.
+
+tcpdump doesn't have an option to assemble TCP sessions from packets
+directly, but you can "fake" it by using what I call "the tcpdump
+strings trick". The tcpdump Strings Trick
+
+Usually when I'm capturing traffic, it's just for the purpose of casual
+analysis. The data doesn't need to be perfect if it shows me what I'm
+looking for and helps me gain some insight.
+
+In these cases, speed and convenience reign supreme. The following trick
+is along these lines and is one of my favorite tcpdump techniques. It
+works because:
+
+  TCP segments usually are sent in chronological order.
+
+  Text-based application protocols produce TCP segments with text
+  payloads.
+
+  The data surrounding the text payloads, such as packet headers,
+  is usually not text.
+
+  The UNIX command strings filters out binary data from streams
+  preserving only text (printable characters).
+
+  When tcpdump is called with -w - it prints raw packets to STDOUT.
+
+Put it all together, and you get a command that dumps real-time HTTP
+session data:
+
+ tcpdump -l -s0 -w - tcp dst port 80 | strings
+
+The -l option above turns on line buffering, which makes sure data gets
+printed to the screen right away.
+
+What is happening here is tcpdump is printing the raw, binary data to the
+screen. This uses a twist on the -w option where the special filename -
+writes to STDOUT instead of a file. Normally, doing this would display
+all kinds of gibberish, but that's where the strings command comes
+in—it allows only data recognized as text through to the screen.
+
+There are few caveats to be aware of. First, data from multiple sessions
+received simultaneously is displayed simultaneously, clobbering your
+output. The more refined you make the filter expression, the less of a
+problem this will be. You also should run separate commands (in separate
+shells) for the client and server side of a session:
+
+ tcpdump -l -s0 -w - tcp dst port 80 | strings tcpdump -l -s0 -w -
+ tcp src port 80 | strings
+
+Also, you should expect to see a few gibberish characters here and
+there whenever a sequence of binary data also happens to look like text
+characters. You can cut down on this by increasing min-len (see the
+strings man page).
+
+This trick works just as well for other text-based protocols. HTTP and
+SMTP Analysis
+
+Using the strings trick in the previous section, you can capture HTTP
+data even though tcpdump doesn't actually understand anything about
+it. You then can "analyze" it further in any number of ways.
+
+If you wanted to see all the Web sites being accessed by "davepc"
+in real time, for example, you could run this command on the firewall
+(assume the internal interface is eth1):
+
+ tcpdump -i eth1 -l -s0 -w - host davepc and port 80 \ | strings | grep
+ 'GET\|Host'
+
+In this example, I'm using a simple grep command to display only lines
+with GET or Host. These strings show up in HTTP requests and together
+show the URLs being accessed.
+
+This works just as well for SMTP. You could run this on your mail server
+to watch e-mail senders and recipients:
+
+ tcpdump -l -s0 -w - tcp dst port 25 | strings \ | grep -i 'MAIL
+ FROM\|RCPT TO'
+
+These are just a few silly examples to illustrate what's possible. You
+obviously could take it beyond grep. You could go as far as to write
+a Perl script to do all sorts of sophisticated things. You probably
+wouldn't take that too far, however, because at that point, there are
+better tools that actually are designed to do that sort of thing.
+
+The real value of tcpdump is the ability to do these kinds of things
+interactively and on a whim. It's the power to look inside any aspect of
+your network whenever you want without a lot of effort. Debugging Routes
+and VPN Links
+
+tcpdump is really handy when debugging VPNs and other network connections
+by showing where packets are showing up and where they aren't. Let's
+say you've set up a standard routable network-to-network VPN between
+10.0.50.0/24 and 192.168.5.0/24 (Figure 2). illustration of a standard
+routable network-to-network VPN
+
+Figure 2. Example VPN Topology
+
+If it's operating properly, hosts from either network should be able to
+ping one another. However, if you are not getting replies when pinging
+host D from host A, for instance, you can use tcpdump to zero in on
+exactly where the breakdown is occurring:
+
+ tcpdump -tn icmp and host 10.0.50.2
+
+In this example, during a ping from 10.0.50.2 to 192.168.5.38, each
+round trip should show up as a pair of packets like the following,
+regardless of from which of the four systems the tcpdump command is run:
+
+ IP 10.0.50.2 > 192.168.5.38: ICMP echo request, ?id 46687, seq 1,
+ length 64 IP 192.168.5.38 > 10.0.50.2: ICMP echo reply, ?id 46687,
+ seq 1, length 64
+
+If the request packets make it to host C (the remote gateway) but not
+to D, this indicates that the VPN itself is working, but there could be
+a routing problem. If host D receives the request but doesn't generate
+a reply, it probably has ICMP blocked. If it does generate a reply but
+it doesn't make it back to C, then D might not have the right gateway
+configured to get back to 10.0.50.0/24.
+
+Using tcpdump, you can follow the ping through all eight possible points
+of failure as it makes its way across the network and back again.
+
+==Misc commands==
+ $ sudo tcpdump -nnqi eth0 -c 10000 | sed 's/[.][0-9]* >//g' | sed 's/[.][0-9]*://g' | awk '{ sumsrc[$3]+= 1 } { sumdst[$4]+= 1 } END { for (src in sumsrc) if (sumsrc[src]>750) print "Source: ", src, ",", sumsrc[src]; } END { for (dst in sumdst) if (sumdst[dst]>750) print "Dest: ",dst, ",", sumdst[dst]; }'
+ tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+ listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
+ 10000 packets captured
+ 10000 packets received by filter
+ 0 packets dropped by kernel
+ Source:  Request , 915
+ Source:  10.6.118.21 , 1442
+ Dest:  10.6.119.255 , 1736
+ Dest:  > , 1012
+ Dest:  10.6.118.21 , 1284
+ Dest:  who-has , 915
+ Dest:  255.255.255.255 , 1119
+
+* Show all UDP traffic from a host 192.168.0.1 that is not port 53 on eth0 with no name resolution (but show any checksum errors):
+ $ tcpdump -i eth0 -nv host 192.168.0.1 udp and not port 53
+
+tcpdump -nnpr any-0305-2020.cap src net 162.242.128.0/17 | cut -d' ' -f3 | cut -d. -f1-4 | sort | uniq -c | sort -rn
+
+==List of supported NIC that can be used by tcpdump==
+$ sudo tcpdump -D
+1.eth0
+2.wlan0
+3.any (Pseudo-device that captures on all interfaces)
+4.lo
+
+==See also==
+* [[sockstat]]

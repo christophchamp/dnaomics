@@ -1,0 +1,3 @@
+yum whatprovides /usr/bin/automake-1.11
+repoquery -lq openssl|head
+rpm -qa --last

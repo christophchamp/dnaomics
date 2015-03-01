@@ -1,0 +1,11 @@
+base64 -d <<<TVRoZAAAAAYAAQABAYBNVHJrAAAAQAD/UQOZlmYAwAAAkFV/CJBOfwiQTn8IkFV/CJBOfwiQTn8IkFV/CJBOfwiQVn8IkE5//y8A |timidity -
+
+$ echo "obase=16;ibase=10;500000"|bc
+7A120 # => 07 A1 20
+
+$  ( printf $( cat test.midx ) ;for i in {2..7}{{0..9},{A..F}}; do printf "\x00\x90\x{$i}\x7F\x04\x80\x${i}\x7F"; done; printf "\xFF\x2F\x00") | timidity -
+
+==External links==
+* https://en.wikipedia.org/wiki/Nibble
+* http://faydoc.tripod.com/formats/mid.htm
+* http://www.youtube.com/watch?v=zRF1S-8P6_k

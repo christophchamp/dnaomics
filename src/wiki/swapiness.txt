@@ -1,0 +1,77 @@
+The Linux kernel provides a tweakable setting that controls how often the swap file is used, called swappiness
+
+A swappiness setting of zero means that the disk will be avoided unless absolutely necessary (you run out of memory), while a swappiness setting of 100 means that programs will be swapped to disk almost instantly.
+
+Ubuntu system comes with a default of 60, meaning that the swap file will be used fairly often if the memory usage is around half of my RAM. You can check your own system's swappiness value by running:
+
+one@onezero:~$ cat /proc/sys/vm/swappiness
+60
+
+As I have 4 GB of RAM, so I'd like to turn that down to 10 or 15. The swap file will then only be used when my RAM usage is around 80 or 90 percent. To change the system swappiness value, open /etc/sysctl.conf as root. Then, change or add this line to the file:
+
+vm.swappiness = 10
+
+Reboot for the change to take effect
+
+You can also change the value while your system is still running
+
+sysctl vm.swappiness=10
+
+you can also clear your swap by running swapoff -a and then swapon -a as root instead of rebooting to achieve the same effect.
+
+To calculate your swap Formula
+
+free -m (total) / 100 = A
+
+A * 10
+
+root@onezero:/home/one# free -m
+             total       used       free     shared    buffers     cached
+Mem:          3950       2262       1687          0        407        952
+-/+ buffers/cache:        903       3047
+Swap:         1953          0       1953
+
+    so total is 3950 / 100 = 39.5 * 10 = 395
+
+so what it mean is that when 10 % 395 MB of ram left then it start using swapiness
+
+What is swappiness
+
+The swappiness parameter controls the tendency of the kernel to move processes out of physical memory and onto the swap disk. Because disks are much slower than RAM, this can lead to slower response times for system and applications if processes are too aggressively moved out of memory.
+
+.     swappiness can have a value of between 0 and 100
+
+.     swappiness=0 tells the kernel to avoid swapping processes out of physical memory for as long as possible
+
+.     swappiness=100 tells the kernel to aggressively swap processes out of physical memory and move them to swap cache
+
+The default setting in Ubuntu is swappiness=60. Reducing the default value of swappiness will probably improve overall performance for a typical Ubuntu desktop installation. A value of swappiness=10 is recommended, but feel free to experiment.
+
+Started Using swap at 91%
+
+have configured my system & vm to make use of ram at 90 % . At 90 % there was no swapping
+
+after that I opened some application like Firefox & Shutter , its start swapping because of ram usage is above 90 % 
+
+==Temporary swap partition==
+ free -m -s 5
+ vmstat 5  # run at 5 second intervals
+ ulimit -a
+
+If there is a limit on the virtual memory you could raise it using `ulimit -v 204800` (200 MB) and see if that gets around the problem. (see: http://ss64.com/bash/ulimit.html)
+
+If it does not appear to be a system limit, I can only imagine that something (maybe xz, maybe something else) is trying to reserve a large amount of memory briefly, and therefore tipping things over the edge.
+
+Try adding a swap file and see what happens:
+
+ sudo su
+ dd if=/dev/zero of=/swapfile bs=1024 count=131072
+ mkswap /swapfile
+ swapon /swapfile
+ echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
+
+This should add a 128 MB swap file, make sure to exclude it from the backup (change /swapfile to be somewhere else if need be, e.g. /backup/swapfile).
+
+==See also==
+* swapon, swapoff - enable/disable devices and files for paging and swapping
+* swaplabel

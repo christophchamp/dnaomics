@@ -1,0 +1,2 @@
+==Firefox Webapps in Unity==
+/usr/share/unity-webapps/userscripts/

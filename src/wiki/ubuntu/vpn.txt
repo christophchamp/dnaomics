@@ -1,0 +1,95 @@
+https://wiki.ubuntu.com/VPN
+
+VPN setup using the command line
+
+Run the following:
+
+sudo apt-get install pptp-linux
+
+Create file /etc/ppp/peers/YOUR_COMPANY with this content:
+
+pty "pptp YOUR_VPN_GATEWAY --nolaunchpppd"
+debug
+nodetach
+logfd 2
+noproxyarp
+ipparam YOUR_COMPANY
+remotename YOUR_COMPANY
+name YOUR_DOMAIN_OR_SERVER_NAME\\YOUR_VPN_LOGIN
+require-mppe-128
+nobsdcomp
+nodeflate
+lock
+noauth
+refuse-eap
+refuse-chap
+refuse-mschap
+
+Add to /etc/ppp/chap-secrets:
+
+YOUR_DOMAIN_OR_SERVER_NAME\\YOUR_VPN_LOGIN * YOUR_VPN_PASSWORD *
+
+Create file /etc/ppp/ip-up.d/add-subnet with content similar to:
+
+[ "$PPP_IPPARAM" = "YOUR_COMPANY" ] || exit 0
+route add -net 192.168.100.0/24 dev $PPP_IFACE
+
+In the above line, adjust subnet values (192.168.100.0/24) if needed
+
+Then run:
+
+sudo chmod a+x /etc/ppp/ip-up.d/add-subnet
+
+- Connect to VPN: sudo pon YOUR_COMPANY To disconnect, press Ctrl+C or close the terminal.
+
+- If you do not want to see VPN connection debug output, in file /etc/ppp/peers/YOUR_COMPANY delete 3 lines: debug nodetach logfd 2
+
+In this case, "pon YOUR_COMPANY" will run as a background process. Use "poff YOUR_COMPANY" to disconnect.
+
+==Example==
+Configuration
+
+Create a configuration file (I called mine my_vpn.conf):
+
+$ gksudo gedit /etc/vpnc/my_vpn.conf
+
+I put in the following:
+
+IPSec gateway X.X.X.X
+IPSec ID GROUPNAME
+IPSec secret GROUPPASSWORD
+Xauth username USERNAME
+Xauth password PASSWORD
+
+Obviously, the capitalized values need to be replaced:
+
+    IPSec gateway: the VPN's gateway/address
+    IPSec ID: the group's name
+    IPSec secret: the group's password
+    Xauth username: the username
+    Xauth password: the password associated with the username
+
+Using your VPN
+
+Once the file is saved, just start the vpn connection:
+
+$ sudo vpnc my_vpn  # note: no need to include the .conf part
+VPNC started in background (pid: 2691)...
+
+Testing:
+
+$ ping 172.30.0.144
+PING 172.30.0.144 (172.30.0.144) 56(84) bytes of data.
+64 bytes from 172.30.0.144: icmp_seq=1 ttl=64 time=114 ms
+64 bytes from 172.30.0.144: icmp_seq=2 ttl=64 time=113 ms
+64 bytes from 172.30.0.144: icmp_seq=3 ttl=64 time=113 ms
+^C
+--- 172.30.0.144 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 113.766/114.199/114.866/0.552 ms
+
+To disconnect it:
+
+$ sudo vpnc-disconnect 
+Terminating vpnc daemon (pid: 2691)
+

@@ -1,0 +1,30 @@
+usermod -aG wheel champ
+useradd -m -s /bin/bash -c "Christoph Champ" -G wheel champ
+
+==sudoers==
+On Ubuntu, its really simple.
+
+# adduser jak sudo
+
+and you’re done!
+
+On CentOS, theres a couple more steps.
+As root, run
+
+# /usr/sbin/usermod -aG wheel jak
+
+then edit the /etc/sudoers file
+
+# nano /etc/sudoers
+
+go down and find this…
+
+## Allows people in group wheel to run all commands
+# %wheel ALL=(ALL) ALL
+
+and remove the hash in front of %wheel so it looks like…
+
+## Allows people in group wheel to run all commands
+%wheel ALL=(ALL) ALL
+
+Once that’s done, your user “jak” is part of the wheel group, who are allowed to use sudo. 

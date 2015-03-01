@@ -1,0 +1,2 @@
+split -b 200m -d ubuntu-12.04.2-server-amd64.iso
+cat x* > ubuntu-12.04.2-server-amd64.iso

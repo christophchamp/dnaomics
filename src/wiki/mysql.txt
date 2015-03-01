@@ -1,0 +1,150 @@
+show engines;
+SHOW VARIABLES LIKE "have_%";
+SHOW STATUS WHERE Variable_name LIKE 'Max%';
+SHOW STATUS LIKE 'Threads_connected';
+SHOW STATUS LIKE '%Threads%';
+SHOW VARIABLES LIKE 'max_connections';
+SHOW GLOBAL STATUS WHERE variable_name = 'Uptime'; # <- in seconds
+#SHOW VARIABLES LIKE "wait_timeout"|"net_read_timeout";
+SHOW VARIABLES LIKE "%_timeout";
+
+http://www.tecmint.com/mysqladmin-commands-for-database-administration-in-linux/
+
+INSERT INTO mysql.user (User,Host,Password) VALUES('demouser','localhost',PASSWORD('demopassword'));
+FLUSH PRIVILEGES;
+GRANT ALL PRIVILEGES ON demodb.* to demouser@localhost;
+GRANT CREATE, ALTER, INDEX, SELECT, INSERT, UPDATE, DELETE, TRIGGER ON cchamp_staging.* to 'cchamp'@'10.179.195.45';
+
+* Assign or change a password for an existing account:
+SET PASSWORD FOR 'c4_usr'@'localhost' = PASSWORD('Antec1280!');
+mysqladmin -u user_name -h host_name password "newpwd"
+
+SELECT User, Host, Password FROM mysql.user;
+SHOW GRANTS FOR 'demouser'@'localhost';
+
+mysqldump -u<dbusername> -p --triggers --routines --databases wordpress | gzip > ~/staging/db/wordpress.sql.gz
+
+* Update mysql.db settings
+select * from db where User='c4_usr' and Db='hostdowns'\G
+update db set Execute_priv='N',Insert_priv='Y' where Db='hostdowns';
+
+*** RUN: /usr/bin/mysql_secure_installation
+
+http://www.rackspace.com/knowledge_center/article/installing-mysql-server-on-centos
+
+perror 111
+
+* Show full process list
+ mysqladmin pr -v
+
+* Check for aborted connections (see: http://www.mysqlperformanceblog.com/2008/08/23/how-to-track-down-the-source-of-aborted_connects/)
+mysqladmin ext | grep Abort
+
+* Check for MySQL uptime
+ $ mysqladmin version
+ mysql> \s
+
+==Misc date queries==
+select month(now());
+SELECT DATE_ADD(LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH)), INTERVAL 1 DAY);
+SELECT SEC_TO_TIME(AVG(TO_SECONDS(NOW()) - TO_SECONDS(NOW()+100)));
+SELECT MONTHNAME(`start_datetime`) AS 'month', COUNT(incident_id) AS 'many', SUM(TO_SECONDS(`last_update`) - TO_SECONDS(`start_datetime`)) AS `work` FROM `compute_incidents` limit 5;
+
+==Misc other queries==
+select SUM(data_length) + SUM(index_length) as size from information_schema.tables where table_schema = 'YOUR_TABLE_NAME';
+
+==Check on database/table sizes==
+mysql -u root -p -B -N -e "SELECT SUM((data_length+index_length)/power(1024,2)) tablesize_mb FROM information_schema.tables;"
+
+For a table mydb.mytable run this for:
+* Bytes:
+ SELECT (data_length+index_length) tablesize
+ FROM information_schema.tables
+ WHERE table_schema='mydb' and table_name='mytable';
+
+* Kilobytes:
+ SELECT (data_length+index_length)/power(1024,1) tablesize_kb
+ FROM information_schema.tables
+ WHERE table_schema='mydb' and table_name='mytable';
+
+* Megabytes:
+ SELECT (data_length+index_length)/power(1024,2) tablesize_mb
+ FROM information_schema.tables
+ WHERE table_schema='mydb' and table_name='mytable';
+
+* Gigabytes:
+SELECT (data_length+index_length)/power(1024,3) tablesize_gb
+FROM information_schema.tables
+WHERE table_schema='mydb' and table_name='mytable';
+
+* Here is a generic query where the maximum unit display is TB (TeraBytes)
+
+SELECT 
+    CONCAT(FORMAT(DAT/POWER(1024,pw1),2),' ',SUBSTR(units,pw1*2+1,2)) DATSIZE,
+    CONCAT(FORMAT(NDX/POWER(1024,pw2),2),' ',SUBSTR(units,pw2*2+1,2)) NDXSIZE,
+    CONCAT(FORMAT(TBL/POWER(1024,pw3),2),' ',SUBSTR(units,pw3*2+1,2)) TBLSIZE
+FROM
+(
+    SELECT DAT,NDX,TBL,IF(px>4,4,px) pw1,IF(py>4,4,py) pw2,IF(pz>4,4,pz) pw3
+    FROM 
+    (
+        SELECT data_length DAT,index_length NDX,data_length+index_length TBL,
+        FLOOR(LOG(IF(data_length=0,1,data_length))/LOG(1024)) px,
+        FLOOR(LOG(IF(index_length=0,1,index_length))/LOG(1024)) py,
+        FLOOR(LOG(IF(data_length+index_length=0,1,data_length+index_length))/LOG(1024)) pz
+        FROM information_schema.tables
+        WHERE table_schema='mydb'
+        AND table_name='mytable'
+    ) AA
+) A,(SELECT 'B KBMBGBTB' units) B;
+
+==Set timezone==
+
+ mysql> SET time_zone = 'America/New_York';
+
+http://www.php.net/manual/en/timezones.php
+http://dev.mysql.com/doc/refman/5.5/en/time-zone-support.html   
+
+If you want to set your timezone for an individual session to GMT+1 (UTC+1 to be precise) just use the string '+01:00' in that command. I.e.:
+
+ mysql> SET time_zone = '+01:00';
+
+To see what timezone your MySQL session is using, just execute this:
+
+ mysql> SELECT @@global.time_zone, @@session.time_zone;
+
+ mysql> SET GLOBAL time_zone = 'America/New_York';
+
+Using the named timezone is important for timezone that has a daylights saving adjustment. However, for some linux builds you may get the following response:
+
+    #1298 - Unknown or incorrect time zone
+
+If you're seeing this, you may need to run a tzinfo_to_sql translation... it's easy to do, but not obvious. From the linux command line type in:
+
+ $ mysql_tzinfo_to_sql /usr/share/zoneinfo/|mysql -u root mysql -p
+
+Provide your root password (MySQL root, not Linux root) and it will load any definitions in your zoneinfo into mysql. You can then go back and run your
+
+ mysql> SET GLOBAL time_zone = timezone;
+
+==ALTER TABLE==
+ALTER TABLE `users` ADD `admin` tinyint(2) unsigned NOT NULL DEFAULT '0', ADD `suspender` tinyint(2) unsigned NOT NULL DEFAULT '0';
+
+==Identify all corrupted tables using myisamchk==
+ myisamchk 
+
+==Slow queries==
+mysql> set global log_output='TABLE';
+mysql> set global log_slow_queries='ON';
+
+Once these are set, any slow queries that take longer than 10 seconds to complete will be logged to the table slow_log in the mysql database. You can test this by running the following query:
+
+mysql> SELECT sleep(20);
+
+Once this completed, you can run the following query to see if it worked:
+
+mysql> select * from mysql.slow_log;
+
+==External links==
+* http://stackoverflow.com/questions/3927690/howto-clean-a-mysql-innodb-storage-engine
+* https://dev.mysql.com/doc/refman/5.0/en/memory-use.html

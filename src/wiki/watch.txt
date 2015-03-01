@@ -1,0 +1,2 @@
+* Execute `ls -lah` every one second:
+ watch --interval 1 ls -lah

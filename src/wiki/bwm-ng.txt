@@ -1,0 +1,7 @@
+http://www.serverwatch.com/tutorials/article.php/3611491/Tip-of-the-Trade-Bandwidth-Monitor-NG.htm
+http://www.gropp.org/?id=projects&sub=bwm-ng
+https://one.rackspace.com/pages/viewpage.action?pageId=54148219
+
+bwm-ng -T max -o plain -u packets
+bwm-ng -T max -o plain -u bits -I vif208.0
+bwm-ng -c 1 -o plain -u packets | grep vif1363.0

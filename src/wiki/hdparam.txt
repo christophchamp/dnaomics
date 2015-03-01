@@ -1,0 +1,2 @@
+* Find HDD serial number (and other information):
+ $ sudo hdparm -I /dev/sda

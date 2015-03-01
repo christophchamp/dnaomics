@@ -1,0 +1,11 @@
+* Add a route from a Cloud Server to a Load Balancer (FirstGen):
+ ip route add 10.189.254.0/23 dev eth1
+
+ ip a
+
+ ip -4 addr show dev eth0|grep inet | sed -e 's/^ *inet \(.*\)\/.*$/\1/'
+ DNS_JSON="{ \"ttl\" : 300, \"name\" : \"$DOMAIN\", \"data\" : \"$(ip -4 addr show dev eth0 | grep inet | sed -e 's/^ *inet \(.*\)\/.*$/\1/')\" }"
+
+==See also==
+* sipcalc
+* ipcalc

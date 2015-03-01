@@ -1,0 +1,139 @@
+split --lines=10 foo
+stty -a | grep echo
+
+# quick substitution
+echo foo
+^foo^bar
+
+jot 9
+enum 1 10
+
+# CamelCase
+echo something-that-is-hyphenated | sed -e 's/-\([a-z]\)/\u\1/g' -e 's/^[a-z]/\u&/'
+echo a-hyphenated-string | sed -E "s/(^|-)([a-z])/\u\2/g"
+
+hypenToCamel() { 
+    tr '-' '\n' | awk '{printf "%s%s", toupper(substr($0,0,1)), substr($0,2)}'
+}
+CAMEL=$(echo something-that-is-hyphenated | hypenToCamel)
+echo $CAMEL
+
+# Multiple directory rename
+for i in *; do echo mv $i ${i/somewhere/elsewhere}; done
+## if the output looks ok:
+for i in *; do echo mv $i ${i/somewhere/elsewhere}; done |sh
+
+rename 'y/A-Z/a-z/' *
+
+#== lsof ======================================================================
+When running tail -f filename, I got the following message:
+ tail: inotify cannot be used, reverting to polling: Too many open files
+
+You can use lsof to understand who's opening so many files. Usually it's a (web)server that opens so many files, but lsof will surely help you identify the cause.
+
+Once you understand who's the bad guy you can
+* kill the process/stop the program
+* raise the ulimit http://posidev.com/blog/2009/06/04/set-ulimit-parameters-on-ubuntu/
+
+If output from lsof is quite huge try redirecting it to a file and then open the file
+
+Example
+ lsof > ~/Desktop/lsof.log
+ lsof | awk '{ print $2; }' | uniq -c | sort -rn | head
+
+#== HOWTOs =============
+/proc/sys/kernel/pid_max
+
+* Generate random string using /dev/urandom
+ echo `cat /dev/urandom | base64 | tr -dc "[:alnum:]" | head -c40`
+ echo `cat /dev/urandom | base64 | tr -dc "[:digit:]" | head -c29`
+
+# Set hostname (one way of doing it):
+cat www.example.com > /proc/sys/kernel/hostname
+
+# Kernel settings, etc.
+/sbin/sysctl -a # display all currently available kernel parameters
+
+# find port numbers:
+ grep mysql /etc/services # 3306
+
+# Setting up a one-shot webserver on port 8080 to present the content of a file
+{ echo -ne "HTTP/1.0 200 OK\r\nContent-Length: $(wc -c <some.file)\r\n\r\n"; cat some.file; } | nc -l 8080
+#~OR~
+{ echo -ne "HTTP/1.0 200 OK\r\nContent-Length: $(echo "Hello world" | wc -c)\r\n\r\n"; echo "Hello world"; } | nc -l 8080
+
+# Show the path to the executable that was run to start PID 1234 (w/permission):
+lsof -p 1234 |awk '{if ($4=="txt"){print $NF}}' |head -1
+
+# Setting user limits
+/etc/security/limits.conf
+cat /proc/sys/fs/file-max
+cat /proc/sys/fs/file-nr
+ulimit -n
+
+# Capture a screen shot of your desktop
+xwd -display :0 -root > screen.xwd ;convert screen.xwd screen.jpg
+
+# See 6 lines of context around line 26:
+nl -ba source.c |egrep -C3 "^\s*26\s"
+
+# Search Google for Google-specific answers
+site:support.google.com/*/answer [your question]
+
+# Pipe mp3 through lame to play with SoX play
+lame --decode music.mp3 - | play -
+
+# printf
+printf "$(date)\n"
+printf "%s\n" "$(date)"
+for p in {1..10}; do printf "%s %s\n" $p $(($p+1)); done
+
+# check localhost bandwidth
+ifconfig lo | grep RX
+
+# ROT13
+tr a-z n-za-m <<<fgrtnabtencul # steganography
+
+# Steganography
+strings mystery-developer1.jpg | sed -n '/^start/,$p' | sed -n '3,$p' | base64 -d
+
+# File system filling up?
+# In ext2/ext3/ext4 file systems 5% of disk space is reserved for root in case
+# of disk being full so processes can work properly. You can check this with
+# command:
+$ sudo dumpe2fs /dev/sda1 | grep Reserved
+# where /dev/sda1 is device of filesystem (you can check it with df command).
+# You can alter this value with tune2fs command:
+$ sudo tune2fs -r 109117 /dev/sda1
+
+getfacl /tmp/secret.txt
+lsattr /tmp/sercret.txt
+chattr -i /tmp/secret.txt
+
+http://www.forensicswiki.org/wiki/Dcfldd
+iotop - simple top-like I/O monitor
+iptraf - Interactive Colorful IP LAN Monitor
+ethstatus - console-based ethernet statistics monitor
+ip addr show
+ip route show
+http://www.tecmint.com/ip-command-examples/
+http://www.tecmint.com/12-tcpdump-commands-a-network-sniffer-tool/
+
+fallocate
+
+comm -23 <( ls asterisk-old/ | sort ) <( ls asterisk/ | sort ) # Show the files that exist in asterisk-old/ but not in asterisk/
+
+# find all Friday 13th's
+printf "2012-07-13 +%s months\n" {0..200}| date -f - |grep ^Fri 
+
+for file in *.zip; do unzip -l "$file" |tail -1 ; done |awk '{SUM += $2} END {print SUM}' # Show total files in all zips
+
+look . | awk '{print length($0),$0}' | sort -nr | cut -d' ' -f2- | less # Find large words to uncharacteristically spice up your life
+
+awk '{print length($0),$0}' names.txt | sort -nr | cut -d' ' -f2- # Order lines of a file by the length of the line descending
+
+sdiff -w$(tput cols) program.py program-bak.py # Like diff, but shows the changes in a side by side format. The -w sets the width
+
+mount | column -t # Show the output of mount in columns to make it easier to read
+
+

@@ -1,0 +1,4 @@
+sudo arping -D -I eth0 -c 2 66.216.100.148
+echo $?
+sudo arping -I eth0 -c 3 66.216.100.148
+sudo sudo arp-scan -I eth0 -l

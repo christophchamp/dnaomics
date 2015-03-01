@@ -1,0 +1,3 @@
+tr \~\. \- < foo
+cat foo
+#asdfas~asdfasd.asdsd~sadfas.asdaf

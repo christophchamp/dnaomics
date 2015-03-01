@@ -1,0 +1,4 @@
+https://wiki.ubuntu.com/ScreenCasts/RecordMyDesktop
+recordmydesktop --width 640 --height 480 -x 200 -y 200 --full-shots --fps 15 --channels 1 --device pulse --v_quality 63 --s_quality 10 --v_bitrate 2000000 --delay 10
+
+http://screencasts.ubuntu.com/Creating_Screencasts

@@ -1,0 +1,2 @@
+http://upstart.ubuntu.com/cookbook/
+http://geeknme.wordpress.com/2009/10/15/getting-started-with-upstart-in-ubuntu/

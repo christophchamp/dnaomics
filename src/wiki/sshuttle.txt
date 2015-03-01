@@ -1,0 +1,6 @@
+sshuttle - poor man's vpn
+
+this easy to install tool redirects all traffic to internet through ssh. it's very usefull when connecting to free wifi. you need to start it as root because it needs permissions to change iptables settings. ofcourse you also need a shell account
+
+E.g.,
+ sshuttle --dns -vvr user@server 0/0

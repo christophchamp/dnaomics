@@ -1,0 +1,2 @@
+* Determine the memory usage for the individual process
+ pmap -d PID | grep writeable/private | awk '{print $4}'

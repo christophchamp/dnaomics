@@ -1,0 +1,11 @@
+* If you would like to only delete the UFW chains, this one-liner should do the job:
+ for i in `iptables-save | grep :ufw | cut -d":" -f2 | cut -d" " -f1`; do iptables -X $i; done;
+
+==See also==
+* [[ufw]]
+
+==External links==
+* https://help.ubuntu.com/8.04/serverguide/firewall.html
+* http://hackertarget.com/psad-port-scan-detection-in-ubuntu-linux/
+* http://www.rackspace.com/knowledge_center/article/configuring-basic-security-0
+* http://www.syntheticworks.com/linux/ufw-we-can-rebuild-him-we-have-the-technology/

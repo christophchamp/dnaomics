@@ -1,0 +1,14 @@
+==XenServer==
+Manually Creating Xen Disk Block Devices in /dev
+
+On newer distros normally udev will create these devices but in some cases it doesnt know how to. Our distros are deployed with the devices already created so that it's not a problem. If you're building your own distro or managed to fubar your /dev directory however, you may need to create the xvd[a-h] block devices manually. The mknod commands below will (re)create these devices.
+
+mknod /dev/xvda b 202 0
+mknod /dev/xvdb b 202 16
+mknod /dev/xvdc b 202 32
+mknod /dev/xvdd b 202 48
+mknod /dev/xvde b 202 64
+mknod /dev/xvdf b 202 80
+mknod /dev/xvdg b 202 96
+mknod /dev/xvdh b 202 112
+

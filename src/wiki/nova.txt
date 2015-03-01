@@ -1,0 +1,1 @@
+http://www.rackspace.com/knowledge_center/article/useful-python-novaclient-commands

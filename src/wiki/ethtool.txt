@@ -1,0 +1,2 @@
+http://www.thegeekstuff.com/2010/10/ethtool-command/
+ethtool -K eth0 tx off rx off tso off

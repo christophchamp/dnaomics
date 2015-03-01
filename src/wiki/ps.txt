@@ -1,0 +1,11 @@
+* Check how long a process has been running:
+
+ ls -ld /proc/10949
+ ps -ef|grep ssh
+ ps -p 10949
+ ps -p 10949 -o etime=
+ ls -l /proc/10949/stat
+ awk '{print "CPU time: " $14+$15; print "start time: " $22}' /proc/10949/stat
+ ps -o stime,time 10949
+ ps -o stime,time,etime,atime 10949
+ ps -eo pid,comm,cmd,start,etime | grep -i 10949

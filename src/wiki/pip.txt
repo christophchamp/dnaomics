@@ -1,0 +1,7 @@
+pip freeze | cut -d = -f 1 | xargs -n 1 pip search | grep -B2 'LATEST:'
+pip freeze --local
+
+import pip
+from subprocess import call
+for dist in pip.get_installed_distributions():
+    call("pip install --upgrade " + dist.project_name, shell=True)

@@ -1,0 +1,50 @@
+$ sudo xinput list
+[sudo] password for champ: 
+⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
+⎜   ↳ Virtual core XTEST pointer              	id=4	[slave  pointer  (2)]
+⎜   ↳ Logitech USB Optical Mouse              	id=9	[slave  pointer  (2)]
+⎜   ↳ SynPS/2 Synaptics TouchPad              	id=12	[slave  pointer  (2)]
+⎣ Virtual core keyboard                   	id=3	[master keyboard (2)]
+    ↳ Virtual core XTEST keyboard             	id=5	[slave  keyboard (3)]
+    ↳ Power Button                            	id=6	[slave  keyboard (3)]
+    ↳ Video Bus                               	id=7	[slave  keyboard (3)]
+    ↳ Power Button                            	id=8	[slave  keyboard (3)]
+    ↳ TOSHIBA Web Camera - HD                 	id=10	[slave  keyboard (3)]
+    ↳ AT Translated Set 2 keyboard            	id=11	[slave  keyboard (3)]
+    ↳ Toshiba input device                    	id=13	[slave  keyboard (3)]
+$ sudo xinput set-prop 12 "Device Enabled" 0
+
+$ xinput list --name-only | grep -i Touchpad
+$ synclient TouchpadOff=1
+$ synclient -l|less
+
+# SEE: http://askubuntu.com/questions/65951/how-to-disable-the-touchpad
+
+==Bash scripts==
+<pre>
+#!/bin/bash
+
+declare -i ID
+ID=`xinput list | grep -Eo 'TouchPad\s*id\=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}'`
+
+xinput set-prop $ID "Device Enabled" 0
+
+echo 'Touchpad has been disabled.'
+</pre>
+
+<pre>
+#!/bin/bash
+
+declare -i ID
+ID=`xinput list | grep -Eo 'TouchPad\s*id\=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}'`
+declare -i STATE
+STATE=`xinput list-props $ID|grep 'Device Enabled'|awk '{print $4}'`
+if [ $STATE -eq 1 ]
+then
+    xinput disable $ID
+    echo "Touchpad disabled."
+else
+    xinput enable $ID
+    echo "Touchpad enabled."
+fi
+</pre>

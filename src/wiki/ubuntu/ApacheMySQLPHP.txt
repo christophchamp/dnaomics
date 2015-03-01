@@ -1,0 +1,4 @@
+https://help.ubuntu.com/community/ApacheMySQLPHP
+
+/etc/apache2/envvars
+sudo adduser champ www-data

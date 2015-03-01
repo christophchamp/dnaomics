@@ -1,0 +1,26 @@
+sudo dpkg-reconfigure locales 
+local
+echo $LOCALE
+
+You can list locales with
+
+localedef --list-archive
+
+or with
+
+locale -a
+
+Corresponding file size is given by
+
+ls -lh /usr/lib/locale/locale-archive
+
+To remove unsed locales you can do
+
+sudo locale-gen --purge it_IT.UTF-8 en_US.UTF-8 && echo "Success!"
+
+where it_IT.UTF-8 and en_US.UTF-8 are the only two locales I want. The && echo "Success!" at end is useful because locale-gen do not report errors if an unavailable or wrong locale is passed on command line.
+
+==Set locate timezone==
+
+ sudo apt-get install tzdata
+ sudo dpkg-reconfigure tzdata

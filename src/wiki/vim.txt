@@ -1,0 +1,1 @@
+Here is a solution that makes it possible not to abandon changes you made while was editing the file — type :w !sudo tee % vi command to save those changes into the file. It will ask you for your password so once you typed it correctly and pressed enter file will be saved.

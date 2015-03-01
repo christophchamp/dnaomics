@@ -1,0 +1,242 @@
+SOURCE: http://www.linuxconfig.org/practical-guide-to-linux-commands
+
+==See also==
+*http://www.linuxconfig.org/Linux_lvm_-_Logical_Volume_Manager
+ 
+===Backup and compression===
+ 
+*This linux command will use tar and bzip2 to compress scripts directory with a maximum compression
+ tar -c scripts/ | bzip2 -9 > scripts.tar.bz2
+*Backup and compress partition /dev/sda1 to a local file sda1.dd.gz .
+ dd if=/dev/sda1 | gzip -c9 > /media/usb/sda1.dd.gz
+*Restore a compressed /dev/sda1 partition backup from a file to a /dev/sda1 partition.
+ cat /media/usb/sda1.dd.gz | gzip -d | dd of=/dev/sda1
+*Make a compressed backup of a hard drive /dev/sda and create a remote copy using ssh
+ dd bs=1M if=/dev/sda | gzip -c9 | ssh user@linuxconfig.org 'dd of=sda.dd.gz'
+*Find and compress all configuration files ( *.conf ) located in /etc/ directory into a file called system_confs.tar.bz2
+ find /etc/ -name '*.conf' | tar -c --files-from=- | bzip2 -9 > system_confs.tar.bz2
+*Backup and store a Master Boot Record of hard drive /dev/sdb into a file my.mbr
+ dd if=/dev/sdb of=my.mbr bs=466 count=1
+*Restore a Master Boot Record from my.mbr file to hard drive /dev/sdb
+ dd if=my.mbr of=/dev/sdb bs=466 count=1
+*Create a complete mirror of a remote website with wget command
+ wget --mirror http://linuxconfig.org
+*Create an archive of /etc/ directory using tar command and compress it with bzip2. Compressed file will contain a current date within a filename.
+ tar cvjf etc_$(date +%Y%m%d).tar.bz2 /etc/
+*Uncompress a bzip2 archive etc.tar.bz2
+ tar xvjf etc.tar.bz2
+*Find all GIF files ( *.gif ) in /var/www/ and copy them to /tmp/gifs directory.
+ find /var/www/ -name '*.gif' | xargs cp -va --target-directory=/tmp/gifs
+*Remotely create a mysql database backup of data database into remote file data.sql .
+ ssh user@linuxconfig.org '( mysqldump --password='pass' data > data.sql )'
+*Split a file linux-commands.iso into 1GB files. This will produce xaa, xab, xac.. files each of max size 1GB. Can be handy when working with FAT32 filesystem. See below on how to restore split file.
+ split -b 1000m linux-commands.iso
+*Restore a split file back into linux-commands.iso. See above on how to split file.
+ cat xa* > linux-commands.iso
+ 
+===Searching the filesystem===
+ 
+*Find all files within /opt directory where file name start with pass or file size is 1000k or more. Feel free to use other boolean operators like AND and NOT.
+ find /opt -name 'pass*' -or -size +1000k
+*Search index and locate all files with *.conf extension. You may need to run updatedb first.
+ locate -r '[^/]*\.conf'
+*Search for all files in /home/lilo which do not have permissions 755
+ find /home/lilo/ -type f ! -perm 755
+*Search for all files in /home/lilo with a permissions 777
+ find /home/lilo/ -type f -perm 777
+*List all files in a current directory sorted by access/creation time
+ ls -ltr
+*Find all files within /tmp created within last 20 minutes
+ find /tmp/ -mmin -20
+*search for a file named file ( case insensitive ) and change its permissions to 777
+ find /tmp -iname file -exec chmod 777 {} \;
+*Search for files int /var/log with size of 8k
+ find /var/log/ -size 8k
+*Create a list setuid.txt containing names of all binary files with setuid and setguid
+ find / * -perm +6000 -type f -exec ls -ld {} \; > setuid.txt
+ 
+===Networking===
+ 
+*Mount remote ftp server to a local filesystem /mnt/my_ftp/
+ curlftpfs ftp-user:ftp-pass@remote.ftp.com /mnt/my_ftp/
+*Execute commands remotely using ssh.
+ ssh user@ssh-server.com '( cd /tmp/ && touch ssh_file.txt )'
+*create a local copy of remote /etc/passwd
+ ssh user@ssh-server.com '( cat /etc/passwd )' > /tmp/passwd
+*sniffing wireless network packets using wlan0 wireless interface
+ airodump-ng -c 6 -w data-capture wlan0
+*Create a fake MAC address for an eth0 network interface
+ macchanger -r eth0
+*Create a ssh tunnel for telnet using local port 4500
+ ssh -L 4500:127.0.0.1:23 linuxconfig.org
+*Tunnel traffic from a local system port 8025 to port mail.sample.org on port 25
+ ssh -L 8025:mail.sample.org:25 mail.sample.org
+*Displays a service which uses port 22
+ lsof -i tcp:22
+*Show status of eth0 network interface
+ ethtool eth0
+*Scan for available wireless networks using wlan0 interface
+ iwlist wlan0 scanning
+*List all TCP ports on the system
+ netstat -ant
+*List all available services on the system
+ netstat -tupl
+*Set a default route via 10.10.10.10
+ ip route add default via 10.10.10.10
+ 
+===Arithmetics and conversions===
+ 
+*Convert hexadecimal number ( in this case FFF ) to decimal using shell expansion.
+ echo $((0xFFF))
+*Convert octal number ( in this case 44 ) to decimal using shell expansion.
+ echo $((8#44))
+*Convert decimal number ( in this case 555 ) to hexadecimal using shell expansion.
+ echo "obase=16; ibase=10; 555;" | bc
+*Convert decimal number ( in this case 64 ) to octal using shell expansion.
+ echo "obase=8; ibase=10; 64;" | bc
+*Convert octal number ( in this case 255 ) to hexadecimal using shell expansion.
+ echo "obase=16; ibase=8; 255;" | bc
+*Multiply a number. For addition and subtraction use "+" and "-" instead of "*"
+ echo "3447.2 * 343.61" | bc
+*Divide number with a floating point precision 10
+ echo "scale=10; 100 / 3" | bc
+*Convert miles to kilometers ( eg. 13 miles )
+ units -t '13miles' 'km'
+*Convert inches to centimeters ( eg. 10.5 inches )
+ units -t '10.5inches' 'cm'
+*Convert milliseconds to hours
+ units -t '78344352ms' 'hour'
+ 
+===Text manipulation===
+ 
+*Convert all characters from Uppercase to Lowercase This will not alter a source file, but create new file called commands.new
+ dd if=commands.txt of=commands.new conv=lcase
+*Rename all files in a current working directory with extension *.sh to *.bash
+ rename 's/\.sh$/.bash/' *.sh
+*Add a prefix new_ to all files in a current working directory with extension *.conf
+ rename 's/^/new_/' *.conf
+*Show only uncommented lines within a configuration file as well as ingnore empty lines.
+ grep -v ^\# /etc/ntp.conf | grep .
+*Remove space from all filenames in a current working directory
+ ls | grep " " | while read -r f; do mv "$f" `echo $f | tr ' ' '_'`; done
+*Change all filenames in a current directory from uppercase to lowercase.
+ ls | while read -r f; do mv "$f" `echo $f | tr '[A-Z]' '[a-z]'`; done
+ 
+===Date and Time===
+ 
+*Convert an epoch time to Coordinated Universal Time
+ date -ud@1244763573
+*Convert date to an epoch time
+ date -d "Dec 23 18:10:02 EST 2010" +%s
+*Download an iso image at 3AM. -c allows you to continue download in case of lost network connection.
+ echo 'wget -c http://linux/distro.iso' | at 03:00
+*What day would be/was 2 Feb 2013? ....Saturday
+ date -d '2 Feb 2013' +%A
+*Convert time to seconds
+ units -t '10 days + 6 hours + 26 minutes + 59 seconds' 'seconds'
+ 
+===Multimedia===
+ 
+*Get a burner block device filename
+ wodim --devices
+*Erase / full blank your cd-rw. Note: use wodim --devices to get your block device file name.
+ cdrecord -v blank=all dev=/dev/scd0
+*Erase fast your cd-rw. Note: use wodim --devices to get your block device file name.
+ cdrecord -v blank=fast dev=/dev/scd0
+*Convert WAV audio format to MP3
+ ffmpeg -i out.wav -acodec libmp3lame out.mp3
+*Normalize a volume for all your MP3 audio files to reduce sudden volume spikes between tracks.
+ normalize-mp3 *.mp3
+*Join all MP3 audio files into a single track.
+ cat file1.mp3 file2.mp3 > out.mp3
+*Join all wav audio files into a single track.
+ sox file1.wav file2.wav file3.wav out.wav
+*Convert all MP3 or AC3 audio files into WAV format.
+ for i in $( ls ); do ffmpeg -i $i $i.wav; done
+*Normalize a volume for all your WAV audio files to reduce sudden volume spikes between tracks.
+ normalize-audio -m *.wav
+*Burn all WAV audio files on a CD using device /dev/scd0 .
+ cdrecord -v -nofix -eject dev='/dev/scd0' -audio -pad *.wav
+*Close a CD session using /dev/scd0 burning device.
+ cdrecord -v -fix -eject dev='/dev/scd0'
+*Record a video of your screen into a screen.mpg video file.
+ ffmpeg -f x11grab -s xga -r 25 -i :0 -sameq screen.mpg
+*Resize all images in your current directory ( in this case images with extension *jpg ) to a 25% of the original size.
+ for i in $( ls *.jpg ); do convert -resize 25% $i new_$i; done
+*Create an ISO image from files in /path/to/your/files/
+ mkisofs -o /tmp/cd.iso /path/to/your/files/
+*Burn an ISO image using wodim and /dev/scd0 burning device.
+ wodim -eject -tao speed=0 dev=/dev/scd0 -v -data /my/image.iso
+*Mount ISO image to a /mnt/iso directory.
+ mount -t iso9660 /path/to/iso/file.iso /mnt/iso -o loop
+*Clone a video output to yout VGA port. Useful for presentations. Use xrandr with no arguments to see whether VGA is connected to a projector.
+ xrandr --output VGA --auto
+*Test your microphone.
+ arecord -d 10 /tmp/out.wav
+ 
+===Disk Usage and Administration===
+ 
+*Non-destructive hard drive speed and size test. Replace /dev/hdb with your hard drive.
+ time dd if=/dev/hdb of=/dev/null bs=1024k
+*Get a directory size of all directories in a current working directory, sort them and show first 10 largest. Note: the first directory is a parent directory.
+ du -m --max-depth 1 | sort -rn | head -11
+*Display top 10 largest files or directories in a current working directory.
+ du -s * | sort -k1,1rn | head
+*Create a file /sp with size of 100MB, generate swap signature and include /sp file into overall system's swap memory. This will add another 100MB to your system's swap.
+ dd if=/dev/zero of=/sp bs=10000 count=10000; mkswap /sp; swapon /sp
+*DEB package management only. Show all installed packages and sort them from largest to smallest.
+ dpkg-query -Wf='${Installed-Size;10}\t${Package}\n' | sort -k1,1rn
+*RPM package management only. Show all installed packages and sort them from largest to smallest.
+ rpm -q -a --qf '%10{SIZE}\t%{NAME}\n' | sort -k1,1rn
+*Create a file.data with a random data and approximately with 100MB in size.
+ head -c 100000000 /dev/urandom > file.data
+*Create a 2TB ~/large-file taking no space.
+ dd bs=1 seek=2TB if=/dev/null of=~/large-file
+*Information about free space for a partition located under your current working directory.
+ df -h .
+ 
+===Hardware information===
+ 
+*Retrieve BIOS information.
+ biosdecode
+*Retrieve your BIOS vendor
+ dmidecode -s bios-vendor
+*Retrieve information about your motherboard
+ dmidecode --type baseboard
+*USB disk device files. NOTE: USB disk must be plug-in. May not work on all systems.
+ ls -la /dev/disk/by-id/usb-*
+*Hard drive model of /dev/sdx.
+ hdparm -I /dev/sdx
+*Hard drive speed. NOTE: this test disregards a filesystem.
+ hdparm -tT /dev/sdx
+*Check temperature of /dev/sda hard drive
+ hddtemp /dev/sda
+*Get information about your graphic card
+ lspci | grep VGA
+*Retrieve your processor information. Also try cat /proc/cpuinfo .
+ dmidecode --type 4
+*Retrieve a processor socket type. For this to work you need to have a x86info command available. Try install x86info package.
+ x86info -a 2> /dev/null | grep Connector | uniq
+*Detect number of RAM slots used, their speed and size. Also try: lshw -C memory -short
+ dmidecode -t 17
+*Check your sound card settings and module in use.
+ cat /dev/sndstat
+*Get a battery information.
+ powersave -b
+*Check system's free memory. This includes swap memory. Alternatives are: top, cat /proc/meminfo .
+ free -m
+*Check a size of all hard drives including USB.
+ fdisk -l | grep GB
+ 
+===Tips & Tricks===
+ 
+*Generate 8 random characters. NOTE: mimencode is part of metamail package
+ head -c 4 /dev/urandom | mimencode
+*Display a GUI message in the center of your screen in hour from now.
+ echo "DISPLAY=$DISPLAY xmessage -center 'abc'" | at "NOW +1hour"
+*Fork Bomb. Simple way to crash your system.
+ :(){ :|:& };:
+*Encrypt a file.
+ ccrypt mypasswords.txt
+*Decrypt a previous encrypted file with ccrypt.
+ ccdecrypt mypasswords.txt.cpt

@@ -1,0 +1,13 @@
+http://linuxmafia.com/faq/Admin/init.html
+
+Each of these actions can be done either from the command line (using init/telinit) or at boot time by passing these as arguments to the booting kernel from the bootloader, e.g., GRUB.
+
+Runlevel S (=s) goes directly to a single-user session.
+
+"init q" (or Q) forces re-read of inittab.
+
+"init u" (or U) forces init to re-execute itself, preserving state.
+
+"init -b" (or emergency) bypasses inittab, going into an emergency single-user shell.
+
+"init -a" (or auto) sets the AUTOBOOT environment variable to "yes". 

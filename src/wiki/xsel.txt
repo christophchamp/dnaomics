@@ -1,0 +1,20 @@
+'''xsel'' is a command-line tool to access X clipboard and selection buffers
+
+==Example usage==
+ xsel --clipboard < new-clipboard-contents.txt
+ xsel --clipboard > current-clipboard-contents.txt
+
+===Using xclip instead==
+ cat samples.sh | xclip -sel clip
+ # ~OR~
+ xclip -sel clip < ~/.ssh/id_rsa.pub
+
+you can also setting it in the .bashrc file using alias.
+
+ alias clipboard='xclip -sel clip
+
+==See also==
+* [http://sourceforge.net/projects/xclip/ xclip]
+
+==External links==
+* [https://apps.ubuntu.com/cat/applications/xsel/ Official website]

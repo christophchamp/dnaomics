@@ -1,0 +1,18 @@
+==Test disk performance==
+ time dd if=/dev/zero of=temp.dd bs=1M count=1024 oflag=direct; time dd if=temp.dd of=/dev/null bs=1M count=1024 iflag=direct; rm -f temp.dd 
+
+==Quickly create a large file==
+You can always use `dd` for this, but it is relatively slow:
+ dd if=/dev/zero -of=large_file_test bs=6G count=1
+A faster way is like so:
+ fallocate -l 6G large_file_test
+
+==External links==
+* http://www.rackspace.com/knowledge_center/article/repartitioning-a-standard-linux-cloud-server
+* http://www.ndchost.com/wiki/server-administration/netcat-over-ssh
+* http://linux.icydog.net/ssh/piping.php
+* http://www.inference.phy.cam.ac.uk/saw27/notes/backup-hard-disk-partitions.html
+* http://www.cyberciti.biz/faq/linux-unix-dd-command-show-progress-while-coping/
+* http://cloudnull.io/2011/12/dd-and-the-mighty-disk-destroyer-or-duplicator/
+* http://docs.rackspace.com/servers/api/v2/cs-devguide/content/rescue_mode.html
+* http://superuser.com/questions/557193/can-i-clone-a-root-file-system-of-a-running-server-via-ssh

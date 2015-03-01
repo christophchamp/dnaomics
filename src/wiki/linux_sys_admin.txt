@@ -1,0 +1,97 @@
+==URLS==
+http://www.ibm.com/developerworks/linux/tutorials/l-lpic2201/section2.html
+
+==EXAMPLE==
+
+ Typical Job Description: for a hosting company
+     Providing technical support for Level I-II issues via helpdesk and the telephone.
+     Monitoring servers for stability and taking both proactive and reactive measures to correct and prevent issues.
+     Providing fellow system administrators and support representatives with technical support and guidance.
+     Assisting clients in transferring accounts to our servers.
+     Installing, configuring, and maintaining services such as Apache, MySQL, and Postfix across multiple servers.
+ 
+ Typical Employer Expectations for Skill Set
+     Strong written and verbal communication skills
+     Ability to work well with a team in a fast paced, constantly changed environment
+     Ability to follow instructions from supervisors and senior colleagues.
+     Outstanding customer service skills and a dedication to the customer service experience.
+     Dependable to be at work during assigned shifts and to complete work as expected.
+     Available to work emergency services 24/7 if required.
+     Advanced knowledge of cPanel/WHM control panel.
+     Advanced knowledge of the Linux operating system.
+     Knowledge of bash and Perl shell scripting.
+     Advanced knowledge of in Exim/Postfix/SendMail etc..
+     Advanced knowledge of Apache.
+     General Understanding of PHP, MySQL and HTML.
+ 
+
+
+
+
+The Test
+
+We use some of the following questions as part of our interview process. These questions are designed to see if a person possess a baseline knowledge of Linux command line utilities.
+
+
+ 1) What is the 1st line of a perl script?
+ 
+ 2) What is the 1st line of a bash script?
+ 
+ 3) What is the command that finds the location of an executable within your path on a server (ie. perl or grep)
+ 
+ 4) How do you enable php4 for a directory within a site that requires php5 for all other directories - on a cPanel server?
+ 
+ 5) How do you determine the hardware of a running system?
+ 
+ 6) Update the locate database
+ 
+ 7) Exclude /home/sites from the locate database
+ 
+ 8) Find all of the processes started by “httpd” particular user and kill them in a one liner.
+ 
+ 9) List all of the open files in use by root
+ 
+ 10) Display a list of files that are in a particular directory which are owned by USER and have the permissions of “–rw --- ---“
+ 
+ 11) Where does cPanel log httpd errors?
+ 
+ 12) Setup a key from from Server A to Server B.
+ 
+ 13) Use chkconfig to stop a service from starting
+ 
+ 14) On the test server, (as a bash one liner)
+      a) Schedule the following task to run hourly 
+      b) List all users IP’s that experienced a fav icon not found error, 
+      c) Sort the data by IP Address, 
+      d) Count the number of time each IP was affected, 
+      e) Put that report into a file
+      f) & email the report to hosting@LinuxForum.com.  
+ 
+ 15) rsync the following directory _____ to the following directory______. (excluding all .tar files)
+ 
+ 16) using netstat, report back how many tcp connections are in `LISTEN` state
+ 
+ 17) dig the mx records of LinuxForum.com
+ 
+ 18) List the iptables rules w/ line numbers
+ 
+ 19) Drop line 10 of an iptables rule
+ 
+ 20) Blacklist an IP
+ 
+ 21) Change DNS locally on the server to use Google's 8.8.8.8 server
+ 
+ 22) Schedule the server to restart at 2am by command line
+ 
+ 23) Determine if a service is running
+ 
+ 24) Stop a service
+ 
+ 25) Add a database for a new website
+ 
+ 26) Create a one-liner that does the following task.  
+      A) Generate a report of all IP addresses that appear in access log file from today.  
+      B) Count the number of times an IP appears in the report.  
+      C) Determine what is the 5th most active IP address, 
+      D) Return the second set of 3 digits.  ie. ***.168.***.***
+echo "192.168.0.12"|sed -e 's/[0-9]\{1,\}.\([0-9]\{1,\}\).[0-9]\{1,\}.[0-9]\{1,\}/\1/'

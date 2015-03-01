@@ -1,0 +1,49 @@
+Modifying the Bash Shell with the set Command
+
+Two options that can be set using the set command that will be of some interest to the common user are "-o vi" and "-o emacs". As with all of the environment modifying commands these can be typed at the command prompt or inserted into the appropriate file mentioned above.
+
+Set Emacs Mode in Bash
+ $ set -o emacs 
+
+This is usually the default editing mode when in the bash environment and means that you are able to use commands like those in Emacs (defined in the Readline library) to move the cursor, cut and paste text, or undo editing.
+
+Commands to take advantage of bash's Emacs Mode:
+ctrl-a	Move cursor to beginning of line
+ctrl-e	Move cursor to end of line
+meta-b	Move cursor back one word
+meta-f	Move cursor forward one word
+ctrl-w	Cut the last word
+ctrl-u	Cut everything before the cursor 
+ctrl-k	Cut everything after the cursor
+ctrl-y	Paste the last thing to be cut
+ctrl-_	Undo
+
+NOTE: ctrl- = hold control, meta- = hold meta (where meta is usually the alt or escape key).
+
+A combination of ctrl-u to cut the line combined with ctrl-y can be very helpful. If you are in middle of typing a command and need to return to the prompt to retrieve more information you can use ctrl-u to save what you have typed in and after you retrieve the needed information ctrl-y will recover what was cut.
+
+Set Vi Mode in Bash
+ $ set -o vi 
+
+Vi mode allows for the use of vi like commands when at the bash prompt. When set to this mode initially you will be in insert mode (be able to type at the prompt unlike when you enter vi). Hitting the escape key takes you into command mode.
+
+Commands to take advantage of bash's Vi Mode:
+h	Move cursor left
+l	Move cursor right
+A	Move cursor to end of line and put in insert mode
+0	(zero) Move cursor to beginning of line (doesn't put in insert mode) 
+i	Put into insert mode at current position
+a	Put into insert mode after current position
+dd	Delete line (saved for pasting)
+D	Delete text after current cursor position (saved for pasting)
+p	Paste text that was deleted
+j	Move up through history commands
+k	Move down through history commands
+u	Undo
+
+==External links==
+* http://stackoverflow.com/questions/11927342/bash-real-life-example-for-modifiers
+* http://www.thegeekstuff.com/2011/08/bash-history-expansion/
+* http://www.catonmat.net/blog/the-definitive-guide-to-bash-command-line-history/
+* http://spsneo.com/blog/2009/09/19/bash-history-tips-and-tricks/
+* http://www.tldp.org/LDP/abs/html/declareref.html

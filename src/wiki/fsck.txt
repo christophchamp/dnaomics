@@ -1,0 +1,38 @@
+The file system will need to not be mounted during a fsck, so you can either perform the fsck from within a rescue environment, or trigger a fsck at next boot. To force a fsck at next boot, you simply need to run "touch /forcefsck" and reboot your system.
+
+
+* Check on last fsck, how many reboots before a forced fsck, etc.
+ sudo dumpe2fs -h /dev/diskname
+
+Ubuntu will run fsck if mount count is equal or greater than maximum mount count, or if "next check after" is passed.
+
+==showfsck==
+#!/bin/sh
+
+set -e
+
+export LC_ALL=C
+
+for part in `cat /proc/mounts | grep " ext[234]" | cut -d \  -f 1 | sort | uniq`; do
+    tune2fs -l $part > /dev/null 2>&1 ||
+    { 
+        echo "Unable to access information for $part"
+        continue
+    }
+    MC=$(tune2fs -l $part | awk '/^Mount count:/ {print $3}')
+    MMC=$(tune2fs -l $part | awk '/^Maximum mount count:/ {print $4}')
+    NB=$(expr $MMC - $MC + 1)
+    if [ $NB = 1 ]; then
+        echo "***************************"
+        echo "***************************"
+        echo "* fsck at next mount for $part"
+        echo "***************************"
+        echo "***************************"
+    elif [ $NB -le 5 ]; then
+        echo "***************************"
+        echo "* $NB * /$MMC mount(s) until fsck for $part"
+        echo "***************************"
+    else
+        echo "$NB/$MMC mount(s) until fsck for $part"
+    fi
+done

@@ -1,0 +1,2 @@
+udevadm info -a -p /sys/class/block/xvda1
+udevadm info -a -p /sys/class/net/eth0

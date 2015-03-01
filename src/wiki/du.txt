@@ -1,0 +1,1 @@
+sudo du -hs --one-file-system /

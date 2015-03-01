@@ -1,0 +1,141 @@
+sudo vi /usr/share/i18n/locales/en_US
+# first_weekday 2
+sudo locale-gen
+# refresh desktop
+killall gnome-panel
+
+#== APT-GET ===
+http://www.tecmint.com/useful-basic-commands-of-apt-get-and-apt-cache-for-package-management/
+
+# list installed pkgs
+dpkg -la | grep -i python
+dpkg --get-selections | grep python
+aptitude search python
+aptitude search '?installed ?not(?automatic)'
+
+# remove an installed package
+sudo apt-get remove package-name
+# remove an installed package along with all configuration files
+sudo apt-get --purge remove package-name
+
+# list locations of files in package
+dpkg -L package
+
+# "whatprovides" (which package provided a given file):
+dpkg -S /usr/lib/apache2/modules/mod_proxy.so
+apt-file search /usr/lib/apache2/modules/mod_proxy.so
+
+# show dependencies
+apt-cache showpkg package-name
+
+# check statistics of cache
+apt-cache stats
+
+# search APT packages:
+apt-file search mysqladmin
+
+# list installed pkgs via pip / easy_install
+pip freeze > foo.txt
+find /usr/lib/python2.7/dist-packages/ -type d -maxdepth 1 -print
+pip search /usr/lib/python2.7/dist-packages/ | egrep -B1 'INSTALLED|LATEST'
+## SEE: http://code.activestate.com/recipes/577708-check-for-package-updates-on-pypi-works-best-in-pi/
+
+# simulate installing the package showing you what packages will be installed
+# and configured:
+sudo apt-get -s install <package_name>
+
+# READ
+https://help.ubuntu.com/community/UnityLaunchersAndDesktopFiles
+
+# FIX/ADD the following error message from `apt-get update`
+# W: GPG error: http://packages.medibuntu.org quantal InRelease: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 2EBC26B60C5A2783
+sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 2EBC26B60C5A2783
+
+# ALSA
+# Assuming you're using ALSA driver, run:
+amixer set Master mute   
+amixer set Master unmute
+# Or, you can just use, to toggle mute on and off:
+amixer set Master toggle
+
+# Thesaurus
+sudo apt-get install dict-moby-thesaurus
+zcat /usr/share/dictd/moby-thesaurus.dict.dz|less
+
+# See which files are contained in a given package
+apt-file list package_name
+
+# restart a service / daemon
+sudo service food restart
+
+==Manually Install Multiple Fonts==
+# Download TrueType fonts. (The file extension will be .ttf.) Unzip your files if necessary.
+# Copy .ttf files to
+ /usr/local/share/fonts/truetype #~OR~
+ /usr/share/fonts/truetype
+# Make your own directory and copy the .ttf files into it
+ sudo mkdir myfonts && cd myfonts
+# Make sure they are borth user- and group-owned by root
+ sudo chown root:root *.ttf
+ sudo mkfontdir
+ cd ..
+ fc-cache # let Ubuntu known the fonts are installed so they do not disappear
+
+==Misc commands / config files / etc==
+colordiff foo bar
+vipw / vigr
+chfn # change user info
+http://manpages.ubuntu.com/manpages/hardy/man5/access.conf.5.html
+telinit # change system runlevel
+# /etc/inittab -> /etc/init/rc-sysinit.conf
+fdupes # find duplicate files
+
+==LaTeX==
+# You have to create a directory texmf under your home directory, and extract the .zip file there, so that, for example, the file pgfplots.sty is in ~/texmf/tex/latex/pgfplots/pgfplots.sty.
+# After running texhash in a terminal, you can check if tex finds the file by running the command
+ kpsewhich pgfplots.sty
+# You can also add the line
+ deb http://ppa.launchpad.net/johannes-reinhardt/ppa/ubuntu lucid main
+# to /etc/apt/sources.list
+
+==Fun==
+cmatrix
+
+==Howtos==
+#Q: How do I disable it on a server or via the command-line?
+#A: Just change the report_crashes parameter to false in
+ /etc/default/whoopsie
+Then bid farewell to whoopsie with
+ sudo service whoopsie stop
+# SEE: https://errors.ubuntu.com/
+
+#Q: How do I remove old and/or no longer used Linux kernels
+#A: Use apt-get
+ The following package was automatically installed and is no longer required:
+  linux-headers-3.5.0-22
+Use 'apt-get autoremove' to remove it.
+
+===How to find manually installed packages===
+With this suggestion, I'm assuming your old installation will still boot!
+
+To replicate one set of packages on another machine:
+
+On System A, run:
+ dpkg --get-selections | grep -v deinstall > my-selections
+
+Move the my-selections file over to System B.
+
+On System B, run:
+ dpkg --set-selections < my-selections
+
+and then:
+
+ sudo apt-get dselect-upgrade
+
+Important note: if you have installed packages from non-standard repositories and/or PPAs, you will also want to copy /etc/apt/sources.list and the contents of /etc/apt/sources.list.d/ from System A to System B before you run the upgrade.
+
+You can use dpkg to see what you've removed as well (NB: this will also include packages that you manually installed and removed):
+
+ dpkg --get-selections | grep deinstall
+
+You can see your results in the terminal, or, of course, redirect to a file

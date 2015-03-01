@@ -1,0 +1,140 @@
+syncing your server clock time up using ntp so you are always set to the right time.
+
+for Debian based systems:
+
+http://www.cyberciti.biz/faq/debian-ubuntu-linux-install-ntpd/
+
+for RHEL based systems:
+
+http://www.cyberciti.biz/faq/howto-install-ntp-to-synchronize-server-clock/
+
+
+======
+Q. How do I install and configure NTP ( Network Time Protocol ) daemon to keep my dedicated servers clock in sync?
+
+A. ntpd is an operating system daemon which sets and maintains the system time-of-day in synchronism with Internet standard time servers. Ntpd is a complete implementation of the Network Time Protocol (NTP) version 4 but also retains compatibility with version 3.
+Install ntp server
+
+Type the following command:
+# apt-get install ntp
+Sample output:
+
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following extra packages will be installed:
+  libcap1
+Suggested packages:
+  ntp-doc
+The following NEW packages will be installed:
+  libcap1 ntp
+0 upgraded, 2 newly installed, 0 to remove and 1 not upgraded.
+Need to get 443kB of archives.
+After this operation, 1126kB of additional disk space will be used.
+Do you want to continue [Y/n]? y
+Get:1 http://ftp.us.debian.org lenny/main libcap1 1:1.10-14 [9082B]
+Get:2 http://ftp.us.debian.org lenny/main ntp 1:4.2.4p4+dfsg-7 [434kB]
+Fetched 443kB in 0s (480kB/s)
+Selecting previously deselected package libcap1.
+(Reading database ... 20411 files and directories currently installed.)
+Unpacking libcap1 (from .../libcap1_1%3a1.10-14_i386.deb) ...
+Selecting previously deselected package ntp.
+Unpacking ntp (from .../ntp_1%3a4.2.4p4+dfsg-7_i386.deb) ...
+Processing triggers for man-db ...
+Setting up libcap1 (1:1.10-14) ...
+Setting up ntp (1:4.2.4p4+dfsg-7) ...
+Starting NTP server: ntpd.
+
+Configure NTP server
+
+/etc/ntp.conf is default configuration file. NTP uses UDP port 123 as its transport layer. It is designed particularly to resist the effects of variable latency by using a jitter buffer.
+# vi /etc/ntp.conf
+The default configuration will sync to various low-stratum NTP servers. You can set server as follows:
+
+server 0.debian.pool.ntp.org iburst dynamic
+server 1.debian.pool.ntp.org iburst dynamic
+server 2.debian.pool.ntp.org iburst dynamic
+server 3.debian.pool.ntp.org iburst dynamic
+
+Once file updaed, restart ntp:
+# /etc/init.d/ntp restart
+ntpq - NTP query program
+
+You can use ntpq to list the servers that you are currently polling:
+$ ntpq
+Sample output:
+
+ntpq> peer
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*time.nist.gov   .ACTS.           1 u  128   64  376   64.616   -8.079   0.863
++iguana.igtc.com 198.60.22.240    2 u   19   64  377    9.105   -9.229   0.543
++hydrogen.cert.u 216.218.254.202  2 u   12   64  377   35.950   -7.184   0.438
+-snag.rack911.co 66.90.104.142    3 u   50   64  377   33.782   -0.376   0.464
+
+Alternatively, you can type the following to find out if ntp is working or not:
+$ ntpq -p
+Sample output:
+
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*time.nist.gov   .ACTS.           1 u    3   64  373   64.616   -8.079   0.716
++iguana.igtc.com 198.60.22.240    2 u   28   64  377    9.065   -9.429   0.628
++hydrogen.cert.u 216.218.254.202  2 u   19   64  377   35.950   -7.184   0.357
+-snag.rack911.co 66.90.104.142    3 u   57   64  377   33.695   -0.893   0.645
+
+==stress test==
+    I think the independent_wallclock thing only works on Xen Classic. Also, the time on the host is right, and in xentop, the CPU usage for this instance never drops below 25%. I think this is virtualization related clock drift from high CPU load, too fast for NTP to correct. I don't believe Matt's suggestion will work, though I could be wrong.
+
+    I don't have a good solution for this, either, though I may see if I can reproduce this issue.
+
+    Let's create a cloud server on the l2support account...
+
+    iad / 6556b512-83d4-4f20-ba75-9565997e3e50
+    admin PW: FZwQZQ9dCr4z
+    IP: 162.242.239.196
+
+    in a tmux session as root:
+    root@aaainc1826560:~# ntpdate time.rackspace.com ; ntpdate -q time.rackspace.com
+    12 Feb 20:51:23 ntpdate[4828]: adjust time server 72.3.128.240 offset -0.012549 sec
+    server 2001:4800:d::1, stratum 2, offset -0.010736, delay 0.06238
+    server 72.3.128.240, stratum 2, offset -0.010758, delay 0.06244
+    12 Feb 20:51:29 ntpdate[4829]: adjust time server 2001:4800:d::1 offset -0.010736 sec
+    root@aaainc1826560:~# stress -c 2 &
+    [1] 4830
+    root@aaainc1826560:~# stress: info: [4830] dispatching hogs: 2 cpu, 0 io, 0 vm, 0 hdd
+
+    root@aaainc1826560:~# date
+    Wed Feb 12 20:51:57 UTC 2014
+    root@aaainc1826560:~#
+
+    Let's come back in a while and see what the drift looks like.
+
+    Ah, here:
+    https://wiki.archlinux.org/index.php/time
+
+    So, let's use this terminology.
+
+    This paper looks useful in understanding time keeping in VMs, though it's VMware-centric:
+    http://www.vmware.com/files/pdf/Timekeeping-In-VirtualMachines.pdf
+
+    OK, it looks pretty evident that I can make the system clock lose time by doing high CPU usage:
+
+    root@aaainc1826560:/proc/xen# ntpdate -q time.rackspace.com
+    server 2001:4800:d::1, stratum 2, offset 0.125915, delay 0.06238
+    server 72.3.128.240, stratum 2, offset 0.132261, delay 0.06235
+    12 Feb 21:56:35 ntpdate[8184]: adjust time server 72.3.128.240 offset 0.132261 sec
+
+    This was .11, then .12, now it's .13... I'm pretty sure it'll continue growing while I keep the CPU loaded.....
+
+    ntp tries to keep the system clock continuous, which means it wants to adjust the system clock rate to catch up (or fall behind) to the real time without discontinuity. An inconsistent clock that doesn't drift at a constant rate can confuse this logic pretty badly, and I saw the CPU load on this VM hold at 50% for a while, 25% for a while, and occasionally spike up to 100%...... so, for the sake of argument, let's just say that it's hard for NTP to skew the system clock in a manner that consistently corrects the time....
+
+    This doesn't tell me why the time reverts after correction with ntpdate. They said they confirmed with strace that NTP has nothing to do with that .... hm. It seems reasonable that the system is attempting to correct
+
+    This looks promising:
+    http://my.opera.com/marcomarongiu/blog/2010/08/18/debugging-ntp-again-part-4-and-last
+    Disable kernel discipline...
+
+    It sounds like they're running ntpdate while ntpd is going. ntpd doesn't want ntpdate messing with it's time. Though they claim an strace shows ntpd isn't changing the time, my recollection is that using ntpdate with ntpd running just doesn't work.
+
+https://community.rackspace.com/products/f/25/t/650

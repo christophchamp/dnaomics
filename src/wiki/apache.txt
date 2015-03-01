@@ -1,0 +1,67 @@
+$ httpd -S  # check iv vhost is running
+
+==LAMP install==
+* CentOS/RHEL/Fedora:
+ yum install httpd httpd-devel mysql mysql-server mysql-devel php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml -y; service mysqld start && mysql_secure_installation && service mysqld restart && service httpd start && chkconfig httpd on && chkconfig mysqld on &&iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT && /etc/init.d/iptables save
+
+* Ubuntu:
+ apt-get update && apt-get install apache2 php5 libapache2-mod-php5 mysql-server libapache2-mod-auth-mysql php5-mysql && service mysql start && mysql_secure_installation && service mysql restart && service apache2 restart && ufw allow 80/tcp
+
+==SSL for VHOST==
+<VirtualHost _default_:443>
+ServerName watchhimtrade.com
+ServerAlias www.watchhimtrade.com
+DocumentRoot /var/www/vhosts/watchhimtrade.com
+<Directory /var/www/vhosts/watchhimtrade.com>
+Options Indexes FollowSymLinks MultiViews
+AllowOverride All
+</Directory>
+
+ErrorLog logs/ssl.wht.com.error_log
+CustomLog logs/ssl.wht.com.access_log combined
+
+# Possible values include: debug, info, notice, warn, error, crit,
+# alert, emerg.
+LogLevel warn
+
+SSLEngine on
+SSLCertificateFile /etc/pki/tls/certs/Watchhimtrade.com.crt
+SSLCertificateKeyFile /etc/pki/tls/certs/ca.key
+SSLCACertificateFile /etc/pki/tls/certs/gd_bundle.crt
+</VirtualHost>
+
+==Expires header==
+  <IfModule mod_expires.c>
+          ExpiresActive on
+
+          ExpiresDefault "access plus 60 days"
+
+          ExpiresByType image/jpg "access plus 60 days"
+          ExpiresByType image/png "access plus 60 days"
+          ExpiresByType image/gif "access plus 60 days"
+          ExpiresByType image/jpeg "access plus 60 days"
+
+          ExpiresByType text/css "access plus 1 days"
+
+          ExpiresByType image/x-icon "access plus 1 month"
+
+          ExpiresByType text/javascript "access plus 1 week"
+          ExpiresByType application/x-javascript "access plus 1 week"
+          ExpiresByType application/javascript "access plus 1 week"
+  </IfModule>
+
+#~OR~
+LoadModule expires_module /usr/lib/apache2/modules/mod_expires.so
+ExpiresActive On
+
+<filesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+ExpiresDefault "access plus 3 days"
+</filesMatch>
+
+==Check==
+http://www.hosting.com/support/linux/tuning-the-apache-prefork-mpm/
+apachectl configtest
+
+==External links==
+* http://code.google.com/p/modwsgi/wiki/CheckingYourInstallation
+* [https://community.rackspace.com/products/f/25/t/49 How to install the LAMP stack (CentOS/Fedora/RHEL/Ubuntu/)]

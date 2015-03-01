@@ -1,0 +1,6 @@
+apt-get install xdg-utils
+xdg-open http://google.com
+xdg-settings get default-web-browser
+gnome-open http://christophchamp.com
+select-editor
+sensible-browser

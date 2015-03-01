@@ -1,0 +1,5 @@
+echo "stats settings" | nc localhost 11211
+echo "flush_all" | nc localhost 11211
+
+==External links==
+* https://www.digitalocean.com/community/articles/how-to-install-and-use-memcache-on-ubuntu-12-04

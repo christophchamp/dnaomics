@@ -1,0 +1,13 @@
+==Setting up virtual hosts with email==
+
+ sudo vi /etc/postfix/virtual
+@marcxtof.com   christoph.champ@gmail.com
+info@academiaalchemia.com       whereisdc@gmail.com
+
+ sudo vi /etc/postfix/main.cf
+virtual_alias_domains = marcxtof.com, academiaalchemia.com
+virtual_alias_maps = hash:/etc/postfix/virtual
+
+ sudo /etc/init.d/postfix restart
+ postmap /etc/postfix/virtual
+ sudo postfix reload

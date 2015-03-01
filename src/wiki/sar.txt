@@ -1,0 +1,7 @@
+* How do you use `sar` to find Average Packet/sec sent yesterday from 5pm to 6pm for a slice/all slices?
+ sar -f /var/log/{sa|sysstat}/sa20 -n DEV -s 17:00:00 -e 18:00:00
+
+for i in `echo {28..31} && echo {01..09}`; do sar -f /var/log/sysstat/sa$i -n DEV -s 00:00:01 -e 23:59:59|awk '{r+=$5;t+=$6} END {print r,t}'; done
+
+==External links==
+* [https://community.rackspace.com/products/f/25/t/559 sar 10 uses] &mdash; on Rackspace

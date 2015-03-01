@@ -1,0 +1,63 @@
+Example of MPLS ICMP tunneling
+ traceroute 12.0.1.28
+ 1  50.56.184.2 (50.56.184.2)  9.703 ms  9.649 ms  9.614 ms
+ 2  50.56.129.216 (50.56.129.216)  9.569 ms  9.528 ms  9.487 ms
+ 3  corea.dfw1.rackspace.net (74.205.108.6)  9.423 ms coreb.dfw1.rackspace.net (74.205.108.22)  9.409 ms corea.dfw1.rackspace.net (74.205.108.6)  9.311 ms
+ 4  edge4.dfw1.rackspace.net (74.205.108.49)  9.328 ms  9.282 ms  9.256 ms
+ 5  dal-edge-16.inet.qwest.net (205.171.62.41)  9.267 ms  9.227 ms  9.187 ms
+ 6  * * *
+ 7  192.205.32.53 (192.205.32.53)  10.011 ms  9.970 ms  9.909 ms
+ 8  cr2.dlstx.ip.att.net (12.122.100.90)  54.438 ms  54.421 ms  54.388 ms
+ 9  cr1.attga.ip.att.net (12.122.28.173)  57.228 ms  57.186 ms  57.158 ms
+10  cr2.wswdc.ip.att.net (12.122.1.174)  52.866 ms  52.862 ms  52.820 ms
+11  cr2.n54ny.ip.att.net (12.122.3.37)  56.988 ms  53.695 ms  53.667 ms
+12  n54ny401me3.ip.att.net (12.122.115.73)  50.629 ms  48.373 ms  50.752 ms
+13  whitedwarf-t640.cbbtier3.att.net (12.89.5.14)  51.978 ms  55.167 ms  55.115 ms
+14  route-server.cbbtier3.att.net (12.0.1.28)  54.613 ms  51.817 ms  51.895 ms
+
+http://www.exit109.com/~jeremy/news/providers/traceroute.html
+http://www.cisco.com/en/US/products/sw/iosswrel/ps1831/products_tech_note09186a00800a6057.shtml#traceroute
+
+NOTE: A visualization of IPv4 addresses that responded to ICMP (ping) packets during a two-month (very slow) scan of the IPv4 address space. Some hosts do not respond to the probes due to firewalls, NAT boxes, and ICMP filtering. Thus, the data and map give us a lower bound on IPv4 address utilization.
+
+==IPv4 geolocation==
+I  would like to understand better the current ipv4 address space and need help finding data about the ip allocation for each country. If possible, going further for each city, ISP and organization.
+
+I understand that the IPv4 addresses are controlled by 5 major Regional Internet Registries that together form the Number Resource Organization. Each RIR manages addresses for the following countries:
+
+        African Network Information Centre (AfriNIC) for Africa
+
+        American Registry for Internet Numbers (ARIN) for the United States, Canada, several parts of the Caribbean region, and Antarctica.
+
+        Asia-Pacific Network Information Centre (APNIC) for Asia, Australia, New Zealand, and neighboring countries
+
+        Latin America and Caribbean Network Information Centre (LACNIC) for Latin America and parts of the Caribbean region
+
+        Réseaux IP Européens Network Coordination Centre (RIPE NCC) for Europe, Russia, the Middle East, and Central Asia
+
+    -- from wikipedia
+
+Being 5 separate organizations (each one with a different commercial presentation on their websites), I could not find a centralized place with an exhaustive map with all the allocated blocks
+
+I found this site with the ip blocks and assigned countries. Thats part of what I want. Also I dont know if this is reliable
+
+Also, this xkcd comic plays with the same data that I am looking for. The comic is probably based on this interesting image. According to CAIDA (The Cooperative Association for Internet Data Analysis), the image is a result of 2 months of ICMP exploration back in 2006:
+
+    A visualization of IPv4 addresses that responded to ICMP (ping) packets during a two-month (very slow) scan of the IPv4 address space. Some hosts do not respond to the probes due to firewalls, NAT boxes, and ICMP filtering. Thus, the data and map give us a lower bound on IPv4 address utilization.
+
+From the same site, they talk about the Census data source:
+
+    The census data was provided by Information Sciences Institute at the University of Southern California. Internet Addresses Survey dataset, DHS PREDICT ID USC-LANDER/internet_address_survey_it15w-20061108. Traces taken 2006-11-08 to 2007-01-08. Provided by the USC/LANDER project. http://www.isi.edu/ant/lander/. Additional support comes from NSF grant SCI-0427144 and ARIN but does not necessarily reflect the opinions of any of the sponsoring organizations.
+
+I tried finding the pointed dataset and traces but had no success.
+
+I understand that this is essential for the current geolocation solutions, so I would like to understand where their data come from.
+
+==External links==
+* https://en.wikipedia.org/wiki/Regional_Internet_Registry
+* http://imgs.xkcd.com/comics/map_of_the_internet.jpg
+* ftp://ftp.ripe.net/pub/stats/arin/
+* http://catb.org/gpsd/
+* http://stackoverflow.com/questions/16502438/current-ipv4-blocks-allocated-to-each-country-city-organization
+* http://www.ipdeny.com/ipblocks/
+* http://ant.isi.edu/blog/?p=351

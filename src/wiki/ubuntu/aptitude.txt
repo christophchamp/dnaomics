@@ -1,0 +1,2 @@
+* Check that vim-* is installed:
+ aptitude search ~i |grep vim

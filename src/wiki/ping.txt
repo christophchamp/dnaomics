@@ -1,0 +1,78 @@
+
+==Theoretical vs real-world speed limit of Ping==
+
+Ping is the favorite tool of network administrators for testing connectivity and response time over networks, but is there a limit to how fast response times can get?
+
+Of course there is. The answer is c.
+
+Ultimately response time over a network is limited by the speed of light. In a vacuum, light travels with a speed of 299,792 km/s. In air, pretty close to that. It gets slower when traveling through glass (think fiber optics) but this isn’t a Physics paper so we will settle for the theoretical maximum for now. Electricity travels with close to the speed of light as well.
+
+Theoretical response time limits of Ping
+
+So, if we assume that a “ping” travels with the speed of light, which are the best possible response times we can get?
+
+10 km -> 0,067 milliseconds
+100 km -> 0,67 milliseconds
+1,000 km -> 6,7 milliseconds
+10,000 km -> 67 milliseconds
+
+(Note that Ping shows the time for a roundtrip, i.e. 2 x the distance.)
+Pinging between Europe and USA
+
+The distance between New York and Paris is 5,839 km. For light to travel from New York to Paris and then back again would take 40 milliseconds.
+Maximum distance between two places on Earth
+
+If you choose the shortest route, the maximum distance between two locations will never be more than halfway around the planet. Halfway around Earth is about 20,000 km.
+
+Considering that Ping goes to a destination and then back again, the packet sent by Ping would travel 40,000 km, the equivalent of a trip around Earth.
+
+That is 133 milliseconds.
+
+Anyone who has tried to ping various servers across the world will know that this is a way better response time than what you can realistically get. So why is ping so slow?
+
+Why Ping is slower in the real world
+
+The examples above take place under ideal conditions that don’t exist in the real world.
+
+        The actual distance traveled will be longer, more like zig zag than a straight line.
+
+ 
+
+        Repeaters, switches and routers will slow down transfer speeds. The more equipment the signal has to pass through (for example routers), the longer it will take to reach its target.
+
+ 
+
+        The actual speed of the signal will never quite match the speed of light. Even with fiber optics (glass) the speed of light is about 30% slower than through vacuum or air, and most of the distance covered will be through fiber.
+
+ 
+
+        A beam of light bounces around like a pinball when it travels along the thin (admittedly extremely thin) fiber, and that will of course make the distance traveled even longer.
+
+ 
+
+With all this in mind, you should probably double the “ideal” response times shown above for a more realistic target to aim at. It’s useful to know when there is room to push for better network performance, and when the actual physical limits set in.
+
+-----
+Speed of Light:
+You are not going beat the speed of light as an interesting academic point. [http://rescomp.stanford.edu/~cheshire/rants/Latency.html This link] works out Stanford to Boston at ~40ms best possible time. When this person did the calculation he decided the internet operates at about "within a factor of two of the speed of light", so there is about ~85ms transfer time.
+
+TCP Window Size:
+If you are having transfer speed issues you may need to increase the receiving window tcp size. You might also need to enable window scaling if this is a high bandwidth connection with high latency (Called a "Long Fat Pipe"). So if you are transferring a large file, you need to have a big enough receiving window to fill the pipe without having to wait for window updates. I went into some detail on how to calculate that in my answer [http://serverfault.com/questions/133050/methodologies-for-performance-testing-a-wan-link/133073#133073]Tuning an Elephant].
+
+Geography and Latency:
+A failing point of some CDNs (Content Distribtuion Networks) is that they equate latency and geography. Google did a lot of research with their network and found flaws in this, they published the results in the white paper [http://research.google.com/pubs/pub35590.html Moving Beyond End-to-End Path Information to Optimize CDN Performance]:
+
+    First, even though most clients are served by a geographically nearby CDN node, a sizeable fraction of clients experience latencies several tens of milliseconds higher than other clients in the same region. Second, we find that queueing delays often override the benefits of a client interacting with a nearby server.
+
+BGP Peerings:
+Also if you start to study BGP (core internet routing protocol) and how ISPs choose peerings, you will find it is often more about finances and politics, so you might not always get the 'best' route to certain geographic locations depending on your ISP. You can look at how your IP is connected to other ISPs (Autonomous Systems) using a looking glass router. You can also use a special whois service:
+
+ $ whois -h v4-peer.whois.cymru.com "69.59.196.212"
+ PEER_AS | IP               | AS Name
+ 25899   | 69.59.196.212    | LSNET - LS Networks
+ 32869   | 69.59.196.212    | SILVERSTAR-NET - Silver Star Telecom, LLC
+
+It also fun to explore these as peerings with a gui tool like linkrank, it gives you a picture of the internet around you.
+
+==See also==
+* http://www.serviceassurancedaily.com/2008/06/latency-and-jitter/

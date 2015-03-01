@@ -1,0 +1,6 @@
+# Makefile
+README.txt: README.md
+	pandoc -f markdown -t plain README.md -o README.txt
+
+youtube-dl.1: README.md
+	pandoc -s -f markdown -t man README.md -o youtube-dl.1

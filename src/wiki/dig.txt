@@ -1,0 +1,28 @@
+dig ns rackspace.com
+nslookup -type=ns rackspace.com
+
+Rackspace Name Servers
+* dns1.stabletransit.com
+* dns2.stabletransit.com
+
+# using local resolver (with cache)
+dig +noall +stats www.google.com | grep ";; Query time"
+#;; Query time: 3 msec
+
+# using opendns
+dig +noall +stats google.com @208.67.222.222 | grep ";; Query time" 
+#;; Query time: 28 msec
+
+# using my isp dns
+dig +noall +stats google.com @212.27.40.240  | grep ";; Query time" 
+#;; Query time: 20 msec
+
+host -t mx marcxtof.com
+
+dig +short -x 67.207.152.20 # => marcxtof.com (reverse DNS lookup)
+
+
+==Star Wars==
+$ ( seq 1 8 200 ; seq 6 8 200 )|sort -n|xargs -I{} -n 1 dig +short -x 206.214.251.{}
+$ traceroute 216.81.59.173
+$ ( seq 206 8 250 ; seq 209 8 250 )|sort -n|xargs -I{} -n 1 dig +short -x 206.214.251.{}

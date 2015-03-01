@@ -1,0 +1,14 @@
+SOURCE: https://github.com/simsong/tcpflow/wiki/tcpflow-%E2%80%94-A-tcp-ip-session-reassembler
+
+ tcpflow -i any -C -e port 1234  # as root, or with sudo
+
+This does everything I want
+
+    displays the data byte-for-byte as it comes in
+    doesn't display any other metadata
+    listens on all interfaces (so it captures data coming from within the machine and outside)
+
+The "-C" tells it to dump to the console instead of a file. The "-e" enables colors so client->server and server->client are visually distinct.
+
+==See also==
+* ethtool --show-offload eth0

@@ -1,0 +1,47 @@
+Here are 3 one-liners that I got from other techs that do a great job of showing what is utilizing CPU / Proc Queue / Memory - Full Disclosure I didn't write any of them but have used them extensively for years 
+
+CPU / Proc Queue usage
+
+--------------------------------------------------------------------
+
+resize; clear; date; echo "Top 10 Processes";echo "";ps -eo user,%cpu,%mem,\
+rsz,args|sort -rnk2|awk 'BEGIN {printf "%s\t%s\t%s\t%s\t%s\n","USER","%CPU",\
+"%MEM","RSZ","COMMAND"}{printf "%s\t%g'%'\t%g'%'\t%d MB\t%-10s\n",$1,$2,$3,\
+$4/1024,$5}'|head -n10;echo "";sar -u 2 5;echo "";sar -q 2 5
+
+Memory Usage Simple Overview
+
+----------------------------------------------------------------------
+
+resize; clear; date; vmstat -a -S m|tail -n1|awk 'BEGIN {FS=" "}{printf \
+"\nAvail\tActive\tTotal\tPercent Avail\n%sMB\t%sMB\t%sMB\t%s\n\n",$4+$5,$6,\
+$4+$5+$6,($4+$5)/($4+$5+$6)*100}';ps -eo user,%cpu,%mem,rsz,args|sort -rnk4|\
+awk 'BEGIN {printf "%8s %6s %6s %8s %-10s\n","USER","%CPU","%MEM","RSZ",\
+"COMMAND"}{printf "%8s %6s %6s %8s MB %-10s\n",$1,$2,$3,$4/1024,$5}'|head \
+-n10; echo ""; sar -r 2 5; echo ""; sar -u 2 5; echo ""; sar -B 2 5
+
+Memory Usage - Exhaustive Overview
+
+---------------------------------------------------------------------
+
+resize; clear; echo "== Server Time: =="; date '+%F %r'; echo -e "\n== Memory Utilization Information: =="; free -m | awk '{ if ($1 == "Mem:") { TOTAL=$2; USED=$3; FREE=$4; } if ($1 == "-/+") { BUFFERS=$3; CACHE=$4; } } END {printf "Total Memory\tActive Memory\tPercentage Used\n%dM\t\t%dM\t\t%.2f%%\n",TOTAL,BUFFERS,BUFFERS/TOTAL * 100; }';  echo -e "\n== Current Swap Usage: =="; swapon -s | sed 1d | awk 'BEGIN { print "DEVICE\t\tUSED\t\tTOTAL\t\tPERCENT USED"; } { DEVICE=$1; TOTAL=($3/1024); USED=($4/1024); PERCENT=((USED/TOTAL)*100); printf "%s\t%.2fM\t%.2fM\t%.2f%%\n",DEVICE,USED,TOTAL,PERCENT; }' | column -s$'\t' -t; echo -e "\n== Top 10 Processes by Memory Usage: =="; ps ww -eo user,pid,%mem,rsz,args --sort=-rsz | head -11 | awk '{print $1,$2,$3,$4,$5}' | column -t; echo -e "\n== Top 10 Processes By Swap Usage: =="; ( printf "%s\t%s\t%s\n" "PID" "PROCESS" "SWAP"; ( for i in /proc/[0-9]*; do PROC=${i#/proc/}; NAME=$(ps -p ${PROC} -o comm --no-headers); for SWAP in $(grep Swap ${i}/smaps 2>/dev/null | awk '{print $2}' ); do let SUM=${SUM}+${SWAP}; done; echo "${PROC} ${NAME} $( echo "scale=2; ${SUM}/1024" | bc )M"; SUM=0; done | grep -Pv '\b0M$' | sort -grk3,3 | head -10 ) ) | column -t; echo -e "\n== Top 10 Kernel Slab Caches: =="; ( echo "SIZE NAME"; slabtop -o -s c | sed 1,7d | head -10 | awk '{ printf "%.2fM\t%s\n",gensub(/K$/,"","g",$(NF-1))/1024,$NF; }' ) | column -t; echo -e "\n== Last 30 Minutes Memory Usage: =="; sar -r -s $(date --date='-50 minutes' +%T) | sed 1,2d; echo -e "\n== Last 30 Minutes Paging/Swap Statistics: =="; sar -B -s $(date --date='-50 minutes' +%T) | sed 1,2d; if [[ -f ./robe4775-tempfile ]]; then rm -f robe4775-tempfile; fi; sar -B -r -o robe4775-tempfile 1 10 >/dev/null; echo -e "\n== Current 1 Second Memory Usage Statistics (10 Count): =="; sar -r -f ./robe4775-tempfile | sed 1,2d; echo -e "\n== Current 1 Second Paging/Swap Statistics (10 Count): =="; sar -B -f ./robe4775-tempfile | sed 1,2d; if [[ -f ./robe4775-tempfile ]]; then rm -f robe4775-tempfile; fi
+
+Here is a bonus on-liner that helps in terms of disk usage for a single mount point (in this case /)
+
+----------------------------------------------------------------------
+
+resize; clear; date; df -h; echo "Largest Directories:"; du -x / 2>/dev/null | \
+sort -rnk1 | head | awk '{printf "%d MB %s\n", $1/1024,$2}'; echo ""; \
+echo "Largest Files:"; nice -n 19 find / -mount -type f -ls 2>/dev/null | \
+sort -rnk7 |head -10|awk '{printf "%d MB\t%s\n",($7/1024)/1024,$NF}';
+
+To use this for alternate mount points in this case ( /apps) just change the mount point to check in 2 places 
+
+du -x [ mount point] and find [mount point] 
+
+-----------------------------------------------------------------------
+
+resize; clear; date; df -h; echo "Largest Directories:"; du -x /apps 2>/dev/null | \
+sort -rnk1 | head | awk '{printf "%d MB %s\n", $1/1024,$2}'; echo ""; \
+echo "Largest Files:"; nice -n 19 find /apps -mount -type f -ls 2>/dev/null | \
+sort -rnk7 |head -10|awk '{printf "%d MB\t%s\n",($7/1024)/1024,$NF}';

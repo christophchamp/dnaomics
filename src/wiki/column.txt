@@ -1,0 +1,2 @@
+(printf "PERM LINKS OWNER GROUP SIZE MONTH DAY HH:MM/YEAR NAME\n"; ls -l | sed 1d) | column -t
+echo "col1 col2"; echo -e "foo\tbar\nbz\tjaz" | column -t

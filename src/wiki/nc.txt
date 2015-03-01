@@ -1,0 +1,14 @@
+while nc -v -l 4000 > $(date +output-%s) ; do sleep 0.01; done
+telnet localhost 4000
+telnet towel.blinkenlights.nl
+lolcat
+echo "Hello"|cowsay
+cowsay -f beavis.zen Hello
+http://caca.zoy.org/wiki/toilet
+
+$ nc -v www.climagic.org 80
+Connection to www.climagic.org 80 port [tcp/http] succeeded!
+GET / HTTP/1.1
+Host: www.climagic.org
+User-Agent: climagic
+

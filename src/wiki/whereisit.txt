@@ -1,0 +1,10 @@
+https://wiki.debian.org/WhereIsIt
+
+* What files are used for the configuration of the 'troz' package?
+
+ $ dlocate -conf troz
+ $ cat /var/lib/dpkg/info/troz.conffiles
+ # ~OR~
+ $ dlocate -conf openssh-client
+ # ~OR~
+ $ for i in $(dpkg -la|grep apache|awk '{print $2}'); do dlocate -conf $i; done

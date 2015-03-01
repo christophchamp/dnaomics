@@ -1,0 +1,9 @@
+==Creating sub-domains==
+For instance, if you wanted to have the domain pointed at your cloud server, as well as other sub-domains you should create the following records:
+
+A target: 162.242.214.152
+CNAME hostname: <sub-domain> target: example.com
+
+This way when you update your A record with a different IP address all of your sub-domains will point to the new server's IP address.
+
+You will also need to keep in mind to have your server listening for these domain records using virtual-hosts on the web-server of your choice

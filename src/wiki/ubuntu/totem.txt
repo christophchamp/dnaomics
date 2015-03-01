@@ -1,0 +1,15 @@
+==Remove history==
+
+
+If you want to permanently remove the recent file list from totem, edit /usr/share/totem/totem.ui as root and change to following line:
+
+<separator name="recent-separator"/>
+<placeholder name="recent-placeholder"/>
+
+into
+
+<!--<separator name="recent-separator"/>
+<placeholder name="recent-placeholder"/>-->
+
+If you want to reactive history later, all you have to do is remove the part that you added.
+

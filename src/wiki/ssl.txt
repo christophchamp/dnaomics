@@ -1,0 +1,2 @@
+https://www.digitalocean.com/community/articles/how-to-set-up-multiple-ssl-certificates-on-one-ip-with-nginx-on-ubuntu-12-04
+http://shib.kuleuven.be/docs/ssl_commands.shtml

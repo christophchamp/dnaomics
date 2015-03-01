@@ -1,0 +1,4 @@
+/etc/version
+/proc/version
+uname -a
+cat /etc/*rel*

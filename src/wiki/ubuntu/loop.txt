@@ -1,0 +1,40 @@
+Here is how to add more loop devices:
+
+On Debian and ubuntu loop is a module, and you can specify the number of loop devices you want in /etc/modules. Replace:
+ loop
+by
+ loop max_loop=64
+
+(64 for example)
+
+Then you have to disable the module:
+ rmmod loop
+
+and re-enable it:
+ modprobe loop
+
+But the new devices will not append automatically for sure, so if you do not see them in /dev/loop*, you can make them appear this way:
+Edit /sbin/MAKEDEV and change :
+        loop)
+                for part in 0 1 2 3 4 5 6 7
+                do
+                        makedev loop$part b 7 $part $disk
+                done
+                ;;
+
+By:
+        loop)
+                for part in `seq 0 63`
+                do
+                        makedev loop$part b 7 $part $disk
+                done
+                ;;
+
+And execute
+ $ MAKEDEV loop
+
+For me this step did not work either, so I had to create it really by hand :
+ for i in $(seq 0 63); do
+     mknod -m0660 /dev/loop$i b 7 $i
+     chown root.disk /dev/loop$i
+ done

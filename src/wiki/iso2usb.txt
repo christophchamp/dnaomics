@@ -1,0 +1,54 @@
+SOURCE: http://en.opensuse.org/Live_USB_stick
+
+=== Download/Verify LiveCD ISO ===
+Download the installation image of your choice from [http://download.opensuse.org/distribution/12.1/iso/ http://download.opensuse.org/distribution/12.1/iso/].
+ ~> aria2c -x5 http://download.opensuse.org/distribution/12.1/iso/openSUSE-12.1-KDE-LiveCD-x86_64.iso
+You may also want to verify the download integrity
+ ~> gpg --recv-keys 9C800ACA
+ ~> wget http://download.opensuse.org/distribution/12.1/iso/openSUSE-12.1-KDE-LiveCD-x86_64.iso.asc
+ ~> gpg -a openSUSE-12.1-KDE-LiveCD-x86_64.iso.asc
+
+=== Linux Instructions ===
+==== Find Block Device ====
+After inserting your USB stick, you can find out what device it is
+ ~> su
+ # grep -Ff <(hwinfo --disk --short) <(hwinfo --usb --short)
+==== Write ISO to USB ====
+Finally, once you've found your block device, write the image to it. Point 'dd' to the full path such as '/home/user/Downloads/openSUSE-12.1-KDE-LiveCD-x86_64.iso' or change directory (example: <code>cd ./Downloads</code>) to where the image is contained.
+ # umount /dev/sdX
+ # dd if{{=}}/path/to/downloaded.iso of{{=}}/dev/sdX
+
+Alternate way to create live USB stick via command line on vfat partition [http://lizards.opensuse.org/2012/09/13/live-fat-stick/ live-fat-stick]
+
+=== OS X instructions ===
+==== Find Block Device ====
+Plug-in your USB stick and find what "/dev/diskN" it is mapped to by opening Terminal (where "N" stands for "disk0", "disk1", "disk2" etc). To do so, please execute:
+ # diskutil list
+This will print out the list of currently mapped devices/partitions. Find the USB using "NAME" column. Then note the corresponding /dev/diskN, where "N" is for index of your disk. For example:
+
+<pre>
+/dev/disk2
+   #:                       TYPE        NAME                    SIZE   IDENTIFIER
+   0:                       FAT32                               2.0 GB   disk0
+   1:                                   USB2                    2.0 GB   disk0s1
+</pre>
+
+In this case "/dev/disk2" is the one we want.
+
+==== Unmount USB Stick ====
+Unmount the USB stick
+ # diskutil unmountDisk /dev/diskN
+Where /dev/diskN is the one you have found in previous step as per our example it would be "/dev/disk2".
+
+==== Write ISO to USB ====
+Write the content of the ISO file:
+ # dd if{{=}}/path/to/downloaded.iso of{{=}}/dev/diskN bs{{=}}4k
+Again the /dev/diskN is the same one you have found previously. You will be prompted for the administrator's password.
+
+==How to make a USB drive bootable==
+# umount /dev/sdX
+# fdisk /dev/sdX
+: p   «--- print partition table
+: a   «--- activate partition (bootable)
+: 1   «--- apply to partition 1
+: w   «--- write changes and exit

@@ -1,0 +1,5 @@
+http://toomuchdata.com/2012/06/25/how-to-install-python-2-7-3-on-centos-6-2/
+http://python.org/ftp/python/
+https://wiki.archlinux.org/index.php/SSH_Keys
+http://wiki.centos.org/TipsAndTricks/BecomingRoot
+

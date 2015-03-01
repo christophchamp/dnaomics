@@ -1,0 +1,51 @@
+You try to upgrade OpenSSH on Debian/Ubuntu (packages openssh-client and openssh-server) and get the following errors:
+
+Unpacking replacement openssh-server ...
+dpkg: error processing /var/cache/apt/archives/openssh-server_1%3a5.5p1-6_amd64.deb (--unpack):
+unable to make backup link of `./usr/sbin/sshd' before installing new version: Operation not permitted
+configured to not write apport reports
+Preparing to replace openssh-client 1:5.1p1-5 (using .../openssh-client_1%3a5.5p1-6_amd64.deb) ...
+Unpacking replacement openssh-client ...
+dpkg: error processing /var/cache/apt/archives/openssh-client_1%3a5.5p1-6_amd64.deb (--unpack):
+unable to make backup link of `./usr/bin/ssh' before installing new version: Operation not permitted
+
+ 
+Solution
+
+(We need root permissions for this, so if you are on Ubuntu, run
+
+ sudo su
+
+first to become root.)
+
+Check the attributes of /usr/bin/ssh:
+
+ lsattr /usr/bin/ssh
+
+root@server1:~# lsattr /usr/bin/ssh
+su--ia------------ /usr/bin/ssh
+root@server1:~#
+
+If you see the attributes i and a, remove them both:
+
+ chattr -i /usr/bin/ssh
+ chattr -a /usr/bin/ssh
+
+If you just see i or a, remove just the one you see.
+
+Now do the same again for /usr/bin/sshd:
+
+ lsattr /usr/bin/sshd
+
+root@server1:~# lsattr /usr/bin/sshd
+su--ia------------ /usr/bin/sshd
+root@server1:~#
+
+If you see the attributes i and a, remove them both:
+
+ chattr -i /usr/bin/sshd
+ chattr -a /usr/bin/sshd
+
+If you just see i or a, remove just the one you see.
+
+Then try the upgrade again. 

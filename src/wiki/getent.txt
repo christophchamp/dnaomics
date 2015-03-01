@@ -1,0 +1,2 @@
+getent passwd `id -u`
+grep $USER /etc/passwd | cut -d: -f3

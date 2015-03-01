@@ -1,0 +1,5 @@
+ ss -o state established '( dport = :ssh or sport = :ssh )'
+
+==External links==
+* https://en.wikipedia.org/wiki/Iproute2
+* [http://lartc.org/howto/ Linux Advanced Routing & Traffic Control HOWTO]
