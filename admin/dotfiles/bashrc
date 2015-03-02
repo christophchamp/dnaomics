@@ -56,13 +56,40 @@ alias pytasks='grep --exclude-dir=.git -rEI "TODO|FIXME" . 2>/dev/null'
 alias nethack='telnet nethack.alt.org'
 alias cmy='mysql -B -N -e'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias genpasswd="strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 30 | tr -d '\n'; echo"
+alias lstree="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
+alias websiteget="wget --random-wait -r -p -e robots=off -U mozilla"
+alias ipinfo="curl ifconfig.me && curl ifconfig.me/host"
+alias weather="curl http://weather.noaa.gov/pub/data/observations/metar/decoded/KSEA.TXT" # Seattle
 
 ## FUNCTIONS ##
+getlocation() { lynx -dump http://www.ip-adress.com/ip_tracer/?QRY=$1|grep address|egrep 'city|state|country'|awk '{print $3,$4,$5,$6,$7,$8}'|sed 's\ip address flag \\'|sed 's\My\\';}
 aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
 function box() { t="$1xxxx";c=${2:-=}; echo ${t//?/$c}; echo "$c $1 $c"; echo ${t//?/$c}; } # aka "bartonski's box"
 function dusage() {
 df -lP|awk '{sum+=$3}END{printf "%d GiB\n", sum/2^20}';
 #df -lP|numsum -3|numprocess /%$(( 2**20 ))/
+}
+
+extract() { 
+    if [ -f $1 ] ; then 
+      case $1 in 
+        *.tar.bz2)   tar xjf $1     ;; 
+        *.tar.gz)    tar xzf $1     ;; 
+        *.bz2)       bunzip2 $1     ;; 
+        *.rar)       unrar e $1     ;; 
+        *.gz)        gunzip $1      ;;
+        *.tar)       tar xf $1      ;;
+        *.tbz2)      tar xjf $1     ;;
+        *.tgz)       tar xzf $1     ;;
+        *.zip)       unzip $1       ;;
+        *.Z)         uncompress $1  ;;
+        *.7z)        7z x $1        ;;
+        *)     echo "'$1' cannot be extracted via extract()" ;;
+         esac
+     else
+         echo "'$1' is not a valid file" 
+     fi
 }
 
 ## PROMPT ##
