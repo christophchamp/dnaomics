@@ -1,0 +1,6 @@
+## SEE: http://en.wikipedia.org/wiki/Cython
+# These commands build and launch the program
+
+$ python setup.py build_ext --inplace
+$ python launch.py
+

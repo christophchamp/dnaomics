@@ -7,36 +7,40 @@ print "%05d" % int('02132')
 # Multi-line regex
 # You could tell the regex to stop matching at the next line that starts with
 # A: (or at the end of the string):
-re.findall(r'A:(.*?)\nB:(.*?)\n(.*?)(?=^A:|\Z)', 
-    f.read(), re.DOTALL|re.MULTILINE)
+re.findall(r'A:(.*?)\nB:(.*?)\n(.*?)(?=^A:|\Z)',
+    f.read(), re.DOTALL | re.MULTILINE)
 
-def min_max(t): return min(t), max(t) # in/out a tuple
+string = "Cape Town 1234"
+comma_string = re.sub(r"(.+?)\s*(\d+)", r"\1,\2", string)
+# "Cape Town,1234"
+
+def min_max(t): return min(t), max(t)  # in/out a tuple
 def printall(*args):
     """Gather the arguments into a tuple
     gather: The operation of assembling a variable-length argument tuple.
     scatter: The operation of treating a sequence as a list of arguments.
     """
-    print args # printall(1, 2.0, '3')
+    print args  # printall(1, 2.0, '3')
 def pointless(required, optional=0, *args):
     # >>> pointless(1,2,3,4,5,6,7)
     # 1 2 (3, 4, 5, 6, 7)
     print required, optional, args
 
-t = (7,3)
-divmod(t) # BAD!
-divmod(*t) # GOOD ("scatter" tuple in arguments)
-divmod(*(7,3))
+t = (7, 3)
+divmod(t)  # BAD!
+divmod(*t)  # GOOD ("scatter" tuple in arguments)
+divmod(*(7, 3))
 
-t = ['a','b','c'] # or: t = ('a','b','c')
+t = ['a', 'b', 'c']  # or: t = ('a','b','c')
 s = "{}.{}.{}".format(*t)
-'.'.join(t) # <- Best way
+'.'.join(t)  # <- Best way
 
 # zip
 s = 'abc'
-t = [0,1,2]
-zip(s,t) # [('a', 0), ('b', 1), ('c', 2)]
-for letter, number in zip('abcd','123'): print number, letter
-[ (number, letter) for letter, number in zip('abcd','123') ]
+t = [0 ,1, 2]
+zip(s,t)  # [('a', 0), ('b', 1), ('c', 2)]
+for letter, number in zip('abcd', '123'): print number, letter
+[ (number, letter) for letter, number in zip('abcd', '123') ]
 for index, element in enumerate('abc'): print index, element
 
 def has_match(t1, t2):
@@ -47,7 +51,9 @@ def has_match(t1, t2):
     return False
 
 #==============================================================================
-l = [[2], [3], [2, 2], [5], [2], [3], [7], [2, 2, 2], [3, 3], [2], [5], [11], [2, 2], [3], [13], [2], [7], [3], [5], [2, 2, 2, 2], [17], [2], [3, 3], [19], [2, 2], [5]]
+l = [[2], [3], [2, 2], [5], [2], [3], [7], [2, 2, 2], [3, 3], [2], [5], [11],
+     [2, 2], [3], [13], [2], [7], [3], [5], [2, 2, 2, 2], [17], [2], [3, 3],
+     [19], [2, 2], [5]]
 
 from collections import defaultdict
 
@@ -310,6 +316,7 @@ def sort_by_length(words):
     for length, word in t:
         res.append(word)
     return res
+## *** Think Python page 152 ***
 
 ##==Random==
 import random
@@ -322,4 +329,21 @@ random.randint(5, 10)
 t = [1, 2, 3]
 random.choice(t)
 
-## *** Think Python page 152 ***
+for dc in ['dfw', 'ord', 'lon', 'syd', 'iad']:
+    url = 'http://reports.ohthree.com/{}/instance/{}/json'.format(dc, str(uuid))
+    response = json.load(urllib2.urlopen(req))[0]['Instance_Data']['host'][2:].replace('-', '.')
+
+ds = dict((chr(i), range(i, i+5)) for i in range(65,70))
+
+## Dictionary comprehensions (PEP 274)
+# SEE: http://www.python.org/dev/peps/pep-0274/
+
+## args/kwargs
+def print_all(*args):
+    return [x for x in enumerate(args)]
+print_all('A','b','b','a')
+# [(0, 'A'), (1, 'b'), (2, 'b'), (3, 'a')]
+
+def f(a, b, c, d, e): print(a, b, c, d, e)
+f(10, *(20,), c=30, **{'d':40, 'e':50})
+# 10 20 30 40 50
