@@ -74,7 +74,7 @@ convert -quality 75 foo.jpg !#:$:s/.jpg/.png/
 echo foo bar !#:$:s/bar/baz/
 join -o 1.1,2.2,1.3,1.4,1.5,1.6,1.7 -1 1 -2 1 -t: passwd shadow
 
-==2015-02-23==
+==February 2015==
 if [ -x `which screen` ]; then screen -q -ls; [ $? -ge 10 ] && screen -ls; fi #in .profile, lists screen sessions on login
 tmux list-sessions 2> /dev/null # Put this in your .bashrc so that on login it will list your tmux sessions. If none, don't show the error.
 grep -o -P "(?<=CRON\[)\d+" /var/log/syslog # GNU grep supports perl regex expressions. This gives only the PID on CRON lines in syslog.
@@ -83,6 +83,87 @@ kill -USR1 $( pidof dd ) # In Linux, find running dd processes and send them a s
 [ -f /etc/shadow ]&&while :;do N=$(($RANDOM%$(tput cols)));for i in $(seq 1 $N);do echo -n " ";done;echo \*;done # Happy Groundhog Day!
 apt-file search /usr/bin/apxs2 # On Debian, find out which non-installed package provides a file. Need to install apt-file package first.
 comm -23 <(grep -rl foo . |sort) <(grep -rl bar . |sort) # When adding "bar" to project, which files contain foo but not bar?
+dig +short txt linux.wp.dg.cx # http://www.commandlinefu.com/commands/view/2829/query-wikipedia-via-console-over-dns
+dig @8.8.8.8 +short txt linux.wp.dg.cx
+time read  # press enter after a given amount of time to get time elapsed
+
+==March 2015==
+pwgen 12
+convert -crop 150x750+100+150 dress.jpg txt: | grep "black|#[01].[01].[01]." # See if there is any black in a 150x750 crop of an image.
+n=(C D E F G A B "C4 ");stat -c%a *|while read -n1 k;do x=${n[$k]};sleep .2;play -qn synth pl ${x}3 fade 0 1 & done # Listen to permissions
+pmd5(){ xsel -p|md5sum|cut -d' ' -f1;}; while :;do if [[ "$l" != "$( pmd5 )" ]];then xsel -p;echo;l=$( pmd5 );fi ;sleep .25;done # paste chk
+find . -maxdepth 1 -type f -printf '%TY-%Tm\n' | sort | uniq -c # Counts files in the current path by modification month.
+find hosts -name auth.log -o -name secure.log | xargs ls -ltra # Find logs for auths under hosts dir and list them by last modified time.
+grep -oP "\w{8}(-\w{4}){3}-\w{12}" # return all UUIDs in a given file (e.g., a log file)
+while [[ $(pgrep -c -f "ssh " ) -le 20 ]]; do sleep 10; done; echo "There is a problem" # Do something special number of ssh processes > 20
+grep -r 'for <me@host>' . |awk -F\; '{print $2}'|while read -r date; do date -d "$date" +%Y-%m-%d ; done > dates-Ymd # E-mail reformat dates
+https://www.digitalocean.com/community/tutorials/top-10-linux-easter-eggs
+Privacy: Tor, Tox, SpiderOak, ProtonMail, Tails
+
+==sed==
+* Print every Nth line (to a maximum)
+function every() { sed -n -e "${2}q" -e "0~${1}p" ${3:-/dev/stdin}; } # 
+
+Print selected lines from a file or the output of a command.
+
+Usage:
+every NTH MAX [FILE]
+
+Print every NTH line (from the first MAX lines) of FILE.
+
+If FILE is omitted, stdin is used.
+
+The command simply passes the input to a sed script:
+sed -n -e "${2}q" -e "0~${1}p" ${3:-/dev/stdin}
+
+print no output
+sed -n
+
+quit after this many lines (controlled by the second parameter)
+-e "${2}q"
+
+print every NTH line (controlled by the first parameter)
+-e "0~${1}p"
+
+take input from $3 (if it exists) otherwise use /dev/stdin
+{3:-/dev/stdin} 
+
+==IRC+expect==
+* Bare Metal IRC Client
+
+ $ nik=clf$RANDOM;sr=irc.efnet.org;expect -c "set timeout -1;spawn nc $sr 6666;set send_human {.1 .2 1 .2 1};expect AUTH*\n ;send -h \"user $nik * * :$nik commandlinefu\nnick $nik\n\"; interact -o -re (PING.:)(.*\$) {send \"PONG :\$interact_out(2,string)\"}"
+
+:Uses the extremely cool utilities netcat and expect.
+:"expect" logs in & monitors for server PING checks.
+:When a PING is received it sends the PONG needed to stay connected.
+:IRC commands to try: HELP, TIME, MOTD, JOIN and PRIVMSG
+:The "/" in front of IRC commands are not needed, e.g. type JOIN #mygroup
+:Learn about expect: http://tldp.org/LDP/LGNET/issue48/fisher.html
+:The sample output shows snippets from an actual IRC session.
+
+==Free Cloud Shell==
+
+* Get a free shell account on a community server
+
+Bash process substitution which curls the website 'hashbang.sh' and executes the shell script embedded in the page.
+
+Download locally over SSL
+
+> curl https://hashbang.sh >> hashbang.sh
+
+Verify integrty with GPG (If available)
+
+> gpg --recv-keys 0xD2C4C74D8FAA96F5
+> gpg --verify hashbang.sh
+
+Inspect source code
+
+> less hashbang.sh
+
+Run
+
+> chmod +x hashbang.sh
+> ./hashbang.sh
 
 ==ubuntu==
 dpkg-awk -f=/var/lib/dpkg/available "Package:^[aA]s.*" -- Package Version
@@ -99,3 +180,69 @@ dpkg-query -Wf '${Package}\t${Version}\n'|head
 * http://howfuckedismydistro.com/
 * http://vim-adventures.com/
 * http://www.climagic.org/txt/difference-between-bash-shell-last-argument-reference-methods.html
+
+==Timing out in a shell script==
+I have a shell script that's reading from standard input. In rare circumstances, there will be no one ready to provide input, and the script must time out. In case of timeout, the script must execute some cleanup code:
+
+ foo=`{ { cat 1>&3; kill 0; } | { sleep 2; kill 0; } } 3>&1`
+
+That is: run the output-producing command and sleep in the same process group, a process group just for them. Whichever command returns first kills the whole process group.
+
+Would anyone wonder: Yes, the pipe is not used; it's bypassed using the redirections. The sole purpose of it is to have the shell run the two process in the same process group.
+
+As Gilles pointed out in his comment, this won't work in a shell script because the script process would be killed along with the two subprocess.
+
+One way¹ to force a command to run in a separate process group is to start a new interactive shell:
+
+ #/bin/sh
+ foo=`sh -ic '{ cat 1>&3; kill 0; } | { sleep 2; kill 0; }' 3>&1 2>/dev/null`
+ [ -n "$foo" ] && echo got: "$foo" || echo timeouted
+
+But there might be caveats with this (e.g. when stdin is not a tty?). The stderr redirection is there to get rid of the "Terminated" message when the interactive shell is killed.
+
+Tested with zsh,bash and dash.
+
+==April 2015==
+for i in /usr/share/cowsay/cows/*.cow; do cowsay -f $i "$i"; done # show all cows
+awk '!NF || !seen[$0]++' # remove duplicate lines whilst keeping order and empty lines
+truncate --size 1G bigfile.txt # Create arbitrary big file full of zeroes but done in a second
+dd if=/dev/zero of=foo.txt bs=1M count=1 # Create a file of a given size in Linux
+dd if=/dev/zero of=sparse_file bs=1024 skip=1024 count=1 # Create a file of a given size in Linux (If you're trying to create a sparse file, you can use dd by 'skip'ing to the last block instance.)
+curl -H"host: mars" http://localhost
+
+* Using awk to sum/count a column of numbers:
+cat count.txt | awk '{ sum+=$1} END {print sum}'
+numsum count.txt
+echo $(( $( cat count.txt | tr "\n" "+" | xargs -I{} echo {} 0 ) ))
+
+* Display the top ten running processes - sorted by memory usage:
+ps aux | sort -nk +4 | tail
+ps aux --sort -rss | head
+ps axo %mem,pid,euser,cmd | sort -nr | head -n 10
+
+look . |grep ph |while read w; do espeak -qx "$w"|grep -q f||echo "$w"; done # Find ph words where the ph is not pronounced as 'f'
+for u in example/bc{3,8}449{0,8,9}2-ab7a-1{3,8}03; do curl -sI $u|grep -q 404||echo $u; done # Try finding the URL given a fuzzy screenshot.
+LESS="+/ass," man mplayer # Open mplayer man page and search for 'ass,'.
+iptables -I INPUT -s $(cut -d' ' -f1 <<<$SSH_CLIENT) -m time --datestop $(date --iso-8601=seconds --date="2 hours" | cut -d+ -f1) -j ACCEPT
+find "$dir" -name '*.txt' -print0|xargs -0 grep -FwiHc $word|sort -rn -t: -k2 # Find *.txt in $dir sorted by lines with $word
+gawk '{gsub("0","",$1);a[$1]+=$2} END {for (p in a){print p " " a[p]}}' resistors.txt # Sum instance counts by start set of non-zero numbers
+googlesay(){ curl -A RG translate\.google\.com/translate_tts -d "tl=en&q=$*" |mpg123 -; }; # Usage: googlesay "How are you?"
+n=('' E4 B3 G3 D3 A2 E2);while read -n1 -p 'string? ' i;do case $i in [1-6]) play -n synth pl ${n[$i]} fade 0 1 ;; *) echo;break;;esac;done
+rm -fv /somedir | tee remove.log  # When you want to see output AND save it, try "| tee" of just a ">" redirect.
+date -d @$(grep ^btime /proc/stat | cut -d" " -f 2) # On Linux, show the exact time/date the system was last booted.
+zgrep -A100 -P "(?<= status: )(?!NOERROR)" 99.*.gz # Use Perl regex to find cases of status: NOT followed by NOERROR in dig output files.
+:'<,'>!sort |column -t # In vim, after using something like 'v' to select a range of lines, you can pass the range of lines through commands
+find . -type l | (while read FN ; do test -e "$FN" || ls -ld "$FN"; done) # Find broken symlinks.
+select mus in *.mp3 ; do mpg123 "$mus" ; done # Multiple choice music player.  Type the number of the song you want to hear.
+echo $(( ( $( date -d '2031-06-28' +%s ) - $( date +%s ) ) / 86400 )) days until Tau day # See http://www.tauday.com
+printf "%d\n" {1..12} | xargs -n1 -I{} date -d "2015-{}-13" | grep ^Fri # How many Friday the 13ths are there this year.
+while true ; do cp -va *.dat /tmp/saveit/ 2> /dev/null ; sleep 0.05 ; done # Try catching a file that shows up temporarily in a queue.
+find . -mtime +$(date +%j) -ls | awk '{sum+=$7} END {print sum}' # How much space files older than the present year are using. %j=Julian day
+find /data -maxdepth 1 -type d -mtime +7 -name '20??????' -exec rm -vf {} + # Remove data dirs with specific length names older than 7 days
+dd if=/dev/sda bs=1G count=80 |pv -s80G |pbzip2 -c |ssh user@remote 'cat > /tmp/sda-80GB.bz2' # First 80GB of sda to remote host w/ progress
+yes "$(seq 231 -1 16)" | while read i; do printf "\x1b[48;5;${i}m\n"; sleep .02; done # A rainbow in your shell.
+mplayer --vf=geq='128+(p(X\,Y)-128)*8' tv:// # Alternate dimension with your webcam. 
+mplayer --vf=geq='p(X\,Y)*gt(W/2\,X)+p(W-1-X\,Y)*lt(W/2-1\,X)' tv:// # Another fun video trick. Mirror right side of video to left.
+showconsolefont
+localectl status  # SEE: https://wiki.archlinux.org/index.php/Keyboard_configuration_in_console
+http://forums.fedoraforum.org/archive/index.php/t-289489.html
