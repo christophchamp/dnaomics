@@ -1,0 +1,16 @@
+php -r ::
+php --help
+php --ini
+php -v
+php --version
+php -m |less
+php -i |less
+php -f class-ex02.php 
+php -r '
+$foo = 1;
+echo $foo;
+'
+php -a
+php -l class-ex02.php 
+php -s class-ex02.php 
+php --rf str_replace
