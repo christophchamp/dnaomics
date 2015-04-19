@@ -65,12 +65,35 @@ alias utc='TZ=UTC date'  # OR: utc="date -u"
 alias starwars="telnet towel.blinkenlights.nl"
 
 ## FUNCTIONS ##
+function ffbookmarks() { sqlite3 ~/.mozilla/firefox/*.[dD]efault/places.sqlite "SELECT strftime('%Y-%m-%d %H:%M:%S', dateAdded/1000000, 'unixepoch', 'localtime'),url FROM moz_places, moz_bookmarks WHERE moz_places.id = moz_bookmarks.fk ORDER BY dateAdded;";
 getlocation() { lynx -dump http://www.ip-adress.com/ip_tracer/?QRY=$1|grep address|egrep 'city|state|country'|awk '{print $3,$4,$5,$6,$7,$8}'|sed 's\ip address flag \\'|sed 's\My\\';}
 aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
+down4me() { curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g' ; }   #Check if a domain is down
 function box() { t="$1xxxx";c=${2:-=}; echo ${t//?/$c}; echo "$c $1 $c"; echo ${t//?/$c}; } # aka "bartonski's box"
 function dusage() {
 df -lP|awk '{sum+=$3}END{printf "%d GiB\n", sum/2^20}';
 #df -lP|numsum -3|numprocess /%$(( 2**20 ))/
+}
+google() {
+    #http://superuser.com/questions/47192/google-search-from-linux-terminal
+    search=""
+    echo "$1"
+    for term in $*; do
+        search="$search%20$term"
+    done
+    xdg-open "http://www.google.com/search?q=$search"
+}
+googlesay(){ curl -A RG translate\.google\.com/translate_tts -d "tl=en&q=$*" |mpg123 -; }; # Usage: googlesay "How are you?"
+netinfo ()  # Shows ip/mac/router address, etc.
+{
+        URL=http://icanhazip.com
+        echo "--------------- Network Information ---------------"
+        /sbin/ifconfig | awk /'inet addr/ {print $2}'
+        /sbin/ifconfig | awk /'Bcast/ {print $3}'
+        /sbin/ifconfig | awk /'inet addr/ {print $4}'
+        /sbin/ifconfig | awk /'HWaddr/ {print $4,$5}'
+    echo Current IP Address: $(curl -s ${URL} | grep -o "[[:digit:].]\+")
+    echo "---------------------------------------------------"
 }
 
 extract() { 
