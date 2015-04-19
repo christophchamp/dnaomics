@@ -1,0 +1,108 @@
+Washington Driver's License Numbers
+
+by Alan De Smet
+http://www.highprogrammer.com/alan/numbers/dl_us_wa.html
+
+You might want to look at my disclaimer before using this information for anything important. You might want to see warning about fake ids before using this information to make a fake id.
+
+I have an online program than can calculate Washington driver's license numbers. Or you can download a copy of the software.
+
+Washington state encodes your last name, first and middle initial, and your date of birth in your driver's license number. These license numbers look like the following:
+
+LLLLLFMYYXmb
+WOO**JT547KA
+WALKECR577DU
+
+The above licenses are for "John T. Woo," born on May 1st, 1946, and "Christopher R. Walken," born on March 31st, 1943
+
+LLLLL - Last Name, truncated - The first five characters are the first five letters of the last name. If the name is shorter than five characters, the extra space is padded with asterisks (*).
+
+F - First Initial
+
+M - Middle Initial
+
+YY - Year of birth, encoded - This is 100 minus the the two digit year of birth. So someone born in 1998 will be 2 (100-98), as will someone born in 1898. I assume if the birth year is a 1900 or 2000 that the result is 00, not 100, but I don't know.
+
+X - Checksum - This cannot be calculated until you know the rest of the license.
+
+Once you have all of the rest of the license characters the following equation will determine the checksum. a1 is the first character (the first letter of the last name), a2 is the second letter, and so on.
+
+checksum = (a1 - a2 + a3 - a4 + a5 - a6 + a7 - a8 + a9 - a11 + a12) mod 10;
+
+For non digits, you can find the number to use in the equation here:
+*   4
+A   1
+B   2
+C   3
+D   4
+E   5
+F   6
+G   7
+H   8
+I   9
+J   1
+K   2
+L   3
+M   4
+N   5
+O   6
+P   7
+Q   8
+R   9
+S   2
+T   3
+U   4
+V   5
+W   6
+X   7
+Y   8
+Z   9
+
+m - Month of birth, encoded. Look up your birth month on this table. There are two options. In general the state will use the first column. If another person has generated the same license number as you, they'll use the second column. (I have no idea what they do after that.)
+Jan 1   B   S
+Feb 2   C   T
+Mar 3   D   U
+Apr 4   J   1
+May 5   K   2
+Jun 6   L   3
+Jul 7   M   4
+Aug 8   N   5
+Sep 9   O   6
+Oct 10  P   7
+Nov 11  Q   8
+Dec 12  R   9
+
+d - Day of month of birth, encoded - Look up the code for your birth's day of month.
+1   A
+2   B
+3   C
+4   D
+5   E
+6   F
+7   G
+8   H
+9   Z
+10  S
+11  J
+12  K
+13  L
+14  M
+15  N
+16  W
+17  P
+18  Q
+19  R
+20  0
+21  1
+22  2
+23  3
+24  4
+25  5
+26  2
+27  7
+28  8
+29  9
+30  T
+31  U
+
+Much of this information (notably the tables for birth day encoding and the checksum algorithm) was derived from Mathematics and Writing in Action. 
