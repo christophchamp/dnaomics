@@ -1,0 +1,72 @@
+ Just enough perl to do most everything! Tom Christianson (spelling?)
+ once posted a canonical list of one line perl programs to do many common
+ command-line tasks.
+ It included:
+# run contents of "my_file" as a program
+ perl my_file
+
+# run debugger "stand-alone"
+ perl -d -e 42
+
+# run program, but with warnings
+ perl -w my_file
+
+# run program under debugger
+ perl -d my_file
+
+# just check syntax, with warnings
+ perl -wc my_file
+
+# useful at end of "find foo -print"
+ perl -nle unlink
+
+# simplest one-liner program
+ perl -e 'print "hello world!\n"'
+
+# add first and penultimate columns
+ perl -lane 'print $F[0] + $F[-2]'
+
+# just lines 15 to 17
+ perl -ne 'print if 15 .. 17' *.pod
+
+# in-place edit of *.c files changing all foo to bar
+ perl -p -i.bak -e 's/\bfoo\b/bar/g' *.c
+
+# command-line that prints the first 50 lines (cheaply)
+ perl -pe 'exit if $. > 50' f1 f2 f3 ...
+
+# delete first 10 lines
+ perl -i.old -ne 'print unless 1 .. 10' foo.txt
+
+# change all the isolated oldvar occurrences to newvar
+ perl -i.old -pe 's{\boldvar\b}{newvar}g' *.[chy]
+
+# command-line that reverses the whole file by lines
+ perl -e 'print reverse <>' file1 file2 file3 ....
+
+# find palindromes
+ perl -lne 'print if $_ eq reverse' /usr/dict/words
+
+# command-line that reverse all the bytes in a file
+ perl -0777e 'print scalar reverse <>' f1 f2 f3 ...
+
+# command-line that reverses the whole file by paragraphs
+ perl -00 -e 'print reverse <>' file1 file2 file3 ....
+
+# increment all numbers found in these files
+ perl i.tiny -pe 's/(\d+)/ 1 + $1 /ge' file1 file2 ....
+
+# command-line that shows each line with its characters backwards
+ perl -nle 'print scalar reverse $_' file1 file2 file3 ....
+
+# delete all but lines beween START and END
+ perl -i.old -ne 'print unless /^START$/ .. /^END$/' foo.txt
+
+# binary edit (careful!)
+ perl -i.bak -pe 's/Mozilla/Slopoke/g' /usr/local/bin/netscape
+
+# look for dup words
+ perl -0777 -ne 'print "$.: doubled $_\n" while /\b(\w+)\b\s+\b\1\b/gi'
+
+# command-line that prints the last 50 lines (expensively)
+ perl -e 'lines = <>; print @@lines[ $#lines .. $#lines-50' f1 f2 f3 ... 
