@@ -5,6 +5,7 @@
 # Awk: # Insecure if the filenames contain an apostrophe or newline!
 #      # `eval "$(ls -- *.jpg | awk '{print"mv -- \x27"$0"\x27 \x27"toupper($0)"\x27"}')"`
 # tr (SEE): http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+# tr (std): `for f in * ; do mv -- "$f" "$(tr [:lower:] [:upper:] <<< "$f")" ; done`
 # tr (uppercase): `for file in *; do mv -- "$file" "${file^^}"; done`
 # tr (lowercase): `for file in *; do mv -- "$file" "${file,,}"; done`
 # tr (not safe): `ls *.txt | tr '[a-z]' '[A-Z]' | sort | uniq -c | sort -n`
