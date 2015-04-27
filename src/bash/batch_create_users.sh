@@ -35,5 +35,10 @@ for username in `sed -e :a -e '$!N;s/\n/ /;ta' -e 's/[ ;,]\{1,\}/ /g' ${path}`; 
     password=`echo "${username}"|rev`;
     echo "NAME=${username}; PASSWORD=${password}";
     sudo useradd ${username}
+
+    # Change/add password to new user
+    # NOTE: `--stdin` has been deprecated on newer distros. Use `chpasswd` on those
+    # sudo echo 'username:password' | chpasswd
+    # sudo echo -e "password\npassword\n" | passwd
     sudo echo ${password}|passwd ${username} --stdin
 done
