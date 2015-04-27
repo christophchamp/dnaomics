@@ -1,4 +1,21 @@
 #!/bin/bash
+# DESCRIPTION: Batch user creation from file
+#
+# Create a script that meets the following requirements:
+# 1. The script must accept the command line option -f which specifies the path
+#    to a file that contains a list of usernames to be created
+# 2. The list of usernames can be separated by a comma, a variable amount of
+#    whitespace (including newlines), or a semicolon.
+# 3. The script must create a system user for each user listed in the input
+#    file, with a password of the username reversed.
+# Example user list file:
+# $ cat users.txt
+# alice   Bill,charlie;danny
+# earl
+# frank;greg
+
+# With the above input file, the script would create a user "alice" with a
+# password of "ecila", a user "Bill" with the password "lliB", etc.
 
 usage() { echo "usage: $0 [-f <path_to_file>]" 1>&2; exit 1; }
 
@@ -9,20 +26,14 @@ while getopts ":f:" o; do
 done
 shift $((OPTIND-1))
 
+# FIXME
 #if [ -z "${f}" ]; then
 #    usage
 #fi
 
-#for u in `sed -e :a -e '$!N;s/\n/ /;ta' users | sed -e 's/[ ;,]\{1,\}/ /g'`; do name=${u}; pw=`echo "${name}"|rev`; echo "NAME=${u}; ${pw}"; done
-
 for username in `sed -e :a -e '$!N;s/\n/ /;ta' -e 's/[ ;,]\{1,\}/ /g' ${path}`; do
     password=`echo "${username}"|rev`;
     echo "NAME=${username}; PASSWORD=${password}";
-    sudo echo lala|passwd alice --stdin
+    sudo useradd ${username}
+    sudo echo ${password}|passwd ${username} --stdin
 done
-
-#for p in `cat $path`; do
-#	echo ${p};
-#done
-
-
