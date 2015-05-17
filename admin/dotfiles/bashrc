@@ -118,5 +118,50 @@ extract() {
      fi
 }
 
-## PROMPT ##
-PS1='\[\033[0;31m\]\u@newton\[\033[00m\]:\[\033[0;33m\]`pwd`\[\033[00m\]> '
+##== PROMPT ==##
+# Inspired by http://julien.palard.fr/dotfiles/bashrc
+str_sum()
+{
+    BC=$(which bc)
+    if [ -z "$1" ]
+    then
+        echo "Usage str_sum STRING"
+        return
+    fi
+    if [ -x "$BC" ] ; then 
+        printf "%s" "$1" | hexdump -b | head -n 1 | tr ' ' '+' \
+            | sed 's/\+*$//g' | bc
+    else
+        echo 0
+    fi
+}
+
+USERNAME_SUM=$(str_sum "$(whoami)")
+USERNAME_BOLD=$(( ($USERNAME_SUM + 1) % 2))
+USERNAME_HUE=$(( ($USERNAME_SUM + 2) % 6 + 31))
+
+HOSTNAME_SUM=$(str_sum "$(hostname)")
+HOSTNAME_BOLD=$(( ($HOSTNAME_SUM + 1) % 2))
+HOSTNAME_HUE=$(( ($HOSTNAME_SUM + 3) % 6 + 31))
+
+PATH_SUM=$(str_sum "$(pwd)")
+PATH_BOLD=$(( ($PATH_SUM + 1) % 2))
+PATH_HUE=$(( ($PATH_SUM + 12) % 6 + 31))
+
+USERNAME_COLOR=$'\E'"[$USERNAME_BOLD;${USERNAME_HUE}m"
+HOSTNAME_COLOR=$'\E'"[$HOSTNAME_BOLD;${HOSTNAME_HUE}m"
+PATH_COLOR=$'\E'"[$PATH_BOLD;${PATH_HUE}m"
+
+WHITE=$'\E[00m'
+GOLD=$'\E[0;33m'
+
+#PS1='\[\033[0;31m\]\u@\H\[\033[00m\]:\[\033[0;33m\]`pwd`\[\033[00m\]> '
+[ "$TERM" != 'linux' -a z"$TERM" != z'eterm-color' ] && TITLE="\[\033]0;\u@\H:\w\a\]" || TITLE=''
+export PS1="$TITLE\[$USERNAME_COLOR\]\u\[$WHITE\]@\[$HOSTNAME_COLOR\]\H\[$WHITE\]:\[$PATH_COLOR\]\w\[$WHITE\] "
+# .git-prompt.sh is here: https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+if [ -f ~/.git-prompt.sh ]
+then
+    export PROMPT_COMMAND='__git_ps1 "'"$PS1"'" "\\\$ "'
+else
+    export PS1="$PS1"'\$ '
+fi
