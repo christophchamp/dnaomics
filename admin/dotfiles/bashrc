@@ -41,6 +41,7 @@ alias rm='rm -i'
 alias shred='shred -xvzu' # Warning! Completey destroys file(s)!
 alias zp='zypper'
 alias psc='ps xawf -eo pid,user,cgroup,args'
+alias psgrep='ps aux | grep $(echo $1 | sed "s/^\(.\)/[\1]/g")'
 alias t='/home/champ/bin/todo.sh'
 alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
 complete -F _todo t
