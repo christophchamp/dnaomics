@@ -77,6 +77,7 @@ df -lP|awk '{sum+=$3}END{printf "%d GiB\n", sum/2^20}';
 #df -lP|numsum -3|numprocess /%$(( 2**20 ))/
 }
 timeDNS() { parallel -j0 --gnu --tag dig @{} "$*" ::: 208.67.222.222 208.67.220.220 198.153.192.1 198.153.194.1 156.154.70.1 156.154.71.1 8.8.8.8 8.8.4.4 | grep Query | sort -nk5; }
+function sgoogle { Q="$@"; GOOG_URL='https://www.google.de/search?tbs=li:1&q='; AGENT="Mozilla/4.0"; stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}${Q//\ /+}" | grep -oP '\/url\?q=.+?&amp' | sed 's|/url?q=||; s|&amp||'); echo -e "${stream//\%/\x}"; } # Google verbatim search on your terminal
 google() {
     #http://superuser.com/questions/47192/google-search-from-linux-terminal
     search=""
