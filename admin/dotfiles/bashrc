@@ -46,6 +46,7 @@ alias t='/home/champ/bin/todo.sh'
 alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
 complete -F _todo t
 # Nifty extras
+alias shcwd='twistd -n web --path .' # Serve current directory tree at http://$HOSTNAME:8080/
 alias webshare='python -c "import SimpleHTTPServer;SimpleHTTPServer.test()"'
 alias servethis="python -c 'import SimpleHTTPServer; SimpleHTTPServer.test()'"
 alias pypath='python -c "import sys; print sys.path" | tr "," "\n" | grep -v "egg"'
