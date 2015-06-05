@@ -66,6 +66,9 @@ alias weather="curl http://weather.noaa.gov/pub/data/observations/metar/decoded/
 alias utc='TZ=UTC date'  # OR: utc="date -u"
 alias starwars="telnet towel.blinkenlights.nl"
 alias timestamp='date "+%Y%m%dT%H%M%S"' # timestamps in ISO 8601 format
+alias cdgen='genisoimage -quiet -iso-level 3 -J -force-rr -l -N -d -allow-leading-dots -allow-multidot -V "`date --rfc-3339=seconds`" -r '
+alias cddump='dd if=/dev/dvd bs=2048 count=$(isosize -d 2048 /dev/dvd) conv=noerror,sync,notrunc' # `cddump | md5sum` || `cddump > disc.iso`
+alias cdburn='cdrecord fs=16m speed=8 padsize=63s -pad -dao -v -' # `cat disc.iso | cdburn`
 
 ## FUNCTIONS ##
 function ffbookmarks() { sqlite3 ~/.mozilla/firefox/*.[dD]efault/places.sqlite "SELECT strftime('%Y-%m-%d %H:%M:%S', dateAdded/1000000, 'unixepoch', 'localtime'),url FROM moz_places, moz_bookmarks WHERE moz_places.id = moz_bookmarks.fk ORDER BY dateAdded;";
