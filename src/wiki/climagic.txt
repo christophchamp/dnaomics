@@ -405,3 +405,9 @@ echo $(($(blockdev --getsz /dev/sdXXX)*512/4096 - 35)) # Calculate the block num
 tree -a -L 1 --inodes /path # Display inodes
 xxd -p source | fold -w2 | paste -sd' ' | sed "s/A/B/g" | xxd -p -r > destination # Binary search/replace
 cmp -l foo.mid bar.mid | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), strtonum(0$3)}' # Binary diff
+ -> diff <(xxd foo.mid) <(xxd bar.mid)
+ -> diff <(od -An -tx1 -w1 foo.mid) <(od -An -tx1 -w1 bar.mid)
+ #   -An removes the address column. This is important otherwise all lines would differ after a byte addition / removal.
+ #   -w1 puts one byte per line, so that diff can consume it.
+ #   -tx1 is the representation you want, change to any possible value, as long as you keep 1 byte per line.
+
