@@ -206,6 +206,7 @@ Tested with zsh,bash and dash.
 for i in /usr/share/cowsay/cows/*.cow; do cowsay -f $i "$i"; done # show all cows
 awk '!NF || !seen[$0]++' # remove duplicate lines whilst keeping order and empty lines
 truncate --size 1G bigfile.txt # Create arbitrary big file full of zeroes but done in a second
+truncate -s0 file.txt # zero out/empty file.txt
 dd if=/dev/zero of=foo.txt bs=1M count=1 # Create a file of a given size in Linux
 dd if=/dev/zero of=sparse_file bs=1024 skip=1024 count=1 # Create a file of a given size in Linux (If you're trying to create a sparse file, you can use dd by 'skip'ing to the last block instance.)
 curl -H"host: mars" http://localhost
@@ -246,3 +247,161 @@ mplayer --vf=geq='p(X\,Y)*gt(W/2\,X)+p(W-1-X\,Y)*lt(W/2-1\,X)' tv:// # Another f
 showconsolefont
 localectl status  # SEE: https://wiki.archlinux.org/index.php/Keyboard_configuration_in_console
 http://forums.fedoraforum.org/archive/index.php/t-289489.html
+n=CDEFGAB;l=asdfghj;while read -n1 k;do x=$(tr $l $n<<<$k);play -qn synth pl ${x}3 fade 0 .7 & done # Poly synth. Press asdfghj
+strace -e open vpnc # View the 'open' system calls made by a program called vpnc. strace = window into program functionality
+perl -e 'for(;;sleep 1){printf"\r"."%.4b "x6,split"",`date +%H%M%S`}' # binary clock
+timeDNS() { parallel -j0 --tag dig @{} "$*" ::: 208.67.222.222 208.67.220.220 198.153.192.1 198.153.194.1 156.154.70.1 156.154.71.1 8.8.8.8 8.8.4.4 | grep Query | sort -nk5; } # a function to find the fastest free DNS server
+fold -sw 20 <(echo "Long Text to be wrapped with \"\n\"") |sed ':a;N;$!ba;s/ *\n/\\n/g' # Wordwrap long text string using "\n"
+awk -F"|" 'BEGIN {OFS="|"} NR==1 {for (b=1;b<=NF;b++) {hdr[b]=$b} } NR > 1 {for (i=1;i<=NF;i++) {if(length($i) > max[i]) max[i] = length($i)} } END {for (i=1;i <= NF;i++) print hdr[i],max[i]+0}' pipe_delimited_file.psv # Show max lengths of all fields in a pipe delimited file with header row
+docker stop $(docker ps -a -q); docker rm $(docker ps -a -q) # Docker.io Stop and Remove all processes
+netstat -anp | grep :80 | grep ESTABLISHED | wc -l # Get number of established sessions on a given port
+debugfs -R  "stat <$(stat --printf=%i filename)>" /dev/sdaX | grep crtime # Get creation date of a file on ext2-3-4 fs
+runonchange () { local cmd=( "$@" ) ; while inotifywait --exclude '.*\.swp' -qqre close_write,move,create,delete $1 ; do "${cmd[@]:1}" ; done ; } # Run a command if file/directory changes. Example: `runonchange /etc/nginx nginx -t`; Ignores vim temp files. Depends on 'inotify-tools' for monitoring of file changes. Alternative to tools like 'entr', 'watchr'.
+awk '{print $0+0}' <(echo -2; echo +3;) #  Removing leading + sign from numbers. The leading plus sign is removed - Minus sign is left intact.
+a=$(b=$(($LINES/2));f() { for c in $(seq $b); do for i in $(seq $c);do echo x;done|xargs echo;done };paste <(f) <(f|tac|tr 'x' '-') <(f|tac|tr 'x' '-') <(f)|tr '\t' ' ');(cat <<<"$a"|tac;cat <<<"$a")|tr '-' ' ' # draw rhomb
+watch -n 10 -d eval "sensors | grep RPM | sed -e 's/.*: *//;s/ RPM.*//'" # Periodic Display of Fan Speed with Change Highlights
+ssh host -t htop
+while :;do printf "\e[%d;%dH\e[48;5;%dm \e[0m" $(($RANDOM%$LINES)) $(($RANDOM%$COLUMNS)) $(($RANDOM%216 )); done
+ls -Sharl # Long list all(a) files(l) in CWD, ordering by size(S) ascending(r) and displaying size in human readable form(h)
+Dec2Bin=({0..1}{0..1}{0..1}{0..1}{0..1}{0..1}{0..1}{0..1}); echo ${Dec2Bin[27]} # Decimal to binary conversion in bash
+mplayer -ao null -vo null --endpos=0.1 *.mp4 | grep VIDEO # Play enough of the video to get the VIDEO dimensions
+find [a-z] -mtime +90 -type f -name '*_log' -exec bzip2 -v9 {} \; # bzip2 compress 90+ day old log files under directories a - z
+last -da | awk '{print $1 " " $NF}' | sort | uniq -c # Analyze your whole Linux lastlog to see the different remote hosts for each user
+
+* cd to a dir by passing /path/to/file.txt (assuming you still want to retain the original functionality if you input a directory, and you are using bash):
+
+<pre>
+cd() {
+    local file="${!#}"
+
+    if (( "$#" )) && ! [[ -d "$file" ]]; then
+        builtin cd "${@:1:($#-1)}" "${file%/*}"
+    else
+        builtin cd "$@"
+    fi
+}
+
+If you are never going to use cd's options (-P, etc), then this will also suffice:
+
+cd() { 
+    if [ -d "$1" ] || [ -z "$1" ]; then
+        builtin cd "$@"
+    else
+        builtin cd "${1%/*}"
+    fi
+}
+</pre>
+
+* Advanced xargs:
+<pre>
+du1() { find . -mindepth 1 -maxdepth 1 -type d -print0 | xargs -P5 -0 -iFF sh -c '( echo `du -sb "FF"` `du -sh "FF"` | sed -e "s%^\([0-9]*\)\ \([^ ]*\)\ \([^ ]*\).*$%\1 \3 \2%g" )' | sort -n | cut -d ' ' -f2,3 | command grep --color=always '^[0-9\.]*[GMK]'; }
+
+du2() { find . -maxdepth 1 -mindepth 1 -type f | tr ' ' "\n" | xargs -P20 -iFF sh -c 'sed -e "s%^\([0-9]*\)\ \([^ ]*\)\ \([^ ]*\).*$%\1 \3 \2%g" <<< $( echo "`( du -sb FF && du -sh FF ) | tr --squeeze \t\n `" )' | sort -n | tail -n 20 | awk '{print $2,$3}' | tr ' ' "\t";}
+</pre>
+
+==World population==
+* Fetch the current human population of Earth:
+ $ curl -s http://www.census.gov/popclock/data/population/world | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["world"]["population"]'
+ #~OR~
+ $ curl -s http://www.census.gov/popclock/data/population/world | awk -F'[:,]' '{print $7}'
+ $ curl -s http://www.census.gov/popclock/data/population/world | jshon -e world -e population -u
+ $ perl -Mojo -E 'say g("http://www.census.gov/popclock/data/population/world")->json->{'world'}{'population'};'
+ #~SOURCE: http://www.commandlinefu.com/commands/view/12542/fetch-the-current-human-population-of-earth
+
+==Google Translate==
+* Google text-to-speech in mp3 format:
+ t2s() { wget -q -U Mozilla -O $(tr ' ' _ <<< "$1"| cut -b 1-15).mp3 "http://translate.google.com/translate_tts?ie=UTF-8&tl=en&q=$(tr ' ' + <<< "$1")"; }
+ curl -A "Mozilla" "http://translate.google.com/translate_tts?tl=en&q=$(echo "$@" | sed 's/ /+/g')" | play -t mp3 -
+ $ p=$(echo "hello world, how r u?"|sed 's/ /+/g');wget -U Mozilla -q -O - "$@" translate.google.com/translate_tts?tl=en\&q=$p|mpg123 -
+ #~SOURCE: http://www.commandlinefu.com/commands/view/12828/google-text-to-speech-in-mp3-format
+
+==OS installed==
+* When was your OS installed?
+ $ ls -lct /etc | tail -1 | awk '{print $6, $7, $8}'
+ #~OR~
+ $ df / | awk '{print $1}' | grep dev | xargs tune2fs -l | grep create
+ $ ls -ldct /lost+found |awk '{print $6, $7}'
+ #~SOURCE: http://www.commandlinefu.com/commands/view/3299/when-was-your-os-installed
+
+==May 2015==
+ls /path/to/file.txt ; cd $(dirname !$)  # cd to path
+whois root\.com | grep -E "Registrant (City|State|Country)"
+curl -s xtof.ch|perl -0777 -pe 's/<.*?>//sg'
+echo -e ${PATH//:/\\n}
+dig @8.8.8.8 +nocl +nostats +nocomment +recurse +multiline +besteffort +additional +noqr -t ANY xtof.c
+dig +short which.opendns.com txt @208.67.220.220 # Check if your ISP is intercepting DNS queries ("#.abc" it's an OK answer) [http://www.commandlinefu.com/commands/view/13142/check-if-your-isp-is-intercepting-dns-queries]
+sudo strace -p <PID> -e trace=write -e write=1,2 # hook into stdout and stderr of a running process.
+ls -l --time=atime --full-time *.txt # Show the last access time of all files ending with .txt. This may not work on all filesystems/setups.
+find . -maxdepth 1 -size 0c -delete # Remove all zero size files from current directory (not recursive).
+find . -maxdepth 1 -empty -delete # Remove all zero size files from current directory (not recursive).
+taskset -cp <core> <pid> # Change proccess affinity. Set the affinity of a process to a particular core(s). Arguments for processor include a comma separated list, or a range. (example: 1,2 or 0-3). You can use top in smp mode (Press 1) to see the changes to the affinity.
+dd if=/path/inputfile | pv | dd of=/path/outpufile # Start dd and show progress every X seconds.
+perl -e 'for(;;){@d=split("",`date +%H%M%S`);print"\r";for(0..5){printf"%.4b ",$d[$_]}sleep 1}' # binary clock [http://www.commandlinefu.com/commands/view/7221/binary-clock]
+qrencode -s 7 -o qr-wifi.png "WIFI:S:$(zenity --entry --text="Network name (SSID)" --title="Create WiFi QR");T:WPA;P:$(zenity --password --title="Wifi Password");;" # Generate QR code for a WiFi hotspot  [http://www.commandlinefu.com/commands/view/13028/generate-qr-code-for-a-wifi-hotspot]
+dpigs  # List your largest installed packages (on Debian/Ubuntu); "debian-goodies" pkg
+ -> dpkg --get-selections | cut -f1 | while read pkg; do dpkg -L $pkg | xargs -I'{}' bash -c 'if [ ! -d "{}" ]; then echo "{}"; fi' | tr '\n' '\000' | du -c --files0-from - | tail -1 | sed "s/total/$pkg/"; done
+ -> dpkg-query -W --showformat='${Installed-Size}\t${Package}\n' | sort -nr | less
+ -> awk '{if ($1 ~ /Package/) p = $2; if ($1 ~ /Installed/) printf("%9d %s\n", $2, p)}'  /var/lib/dpkg/status | sort -n | tail
+ #~SOURCE: http://www.commandlinefu.com/commands/view/3907/list-your-largest-installed-packages-on-debianubuntu
+while true ; do nc -l 80  < index.html ; done # One command line web server on port 80 using nc (netcat)
+ -> nc -kl 5432 -c 'echo -e "HTTP/1.1 200 OK\r\n$(date)\r\n\r\n";echo "<p>How are you today?</p>"'
+sed -e "/$USER/d;s/:.*//g" /etc/group # Tells which group you DON'T belong to (opposite of command "groups")
+while true; do X=$Y; sleep 1; Y=$(ifconfig eth0|grep RX\ bytes|awk '{ print $2 }'|cut -d : -f 2); echo "$(( Y-X )) bps"; done # Measures download speed on eth0
+openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//' # Generate a Random MAC address
+ -> hexdump -n6 -e '/1 ":%02X"' /dev/random|sed s/^://g
+ -> od -An -N10 -x  /dev/random  | md5sum | sed -r 's/^(.{10}).*$/\1/; s/([0-9a-f]{2})/\1:/g; s/:$//;'
+ #~SOURCE: http://www.commandlinefu.com/commands/view/6619/generate-a-random-mac-address
+rename 's/\d+/sprintf("%04d",$&)/e' *.jpg # Numeric zero padding file rename
+ -> ls *.jpg | awk -F'.' '{ printf "%s %04d.%s\n", $0, $1, $2; }' | xargs -n2 mv
+ -> for i in $(seq -w 0 100) ; do mv prefix$(( 10#$i )).jpg prefix${i}.jpg ; done
+ #~SOURCE: http://www.commandlinefu.com/commands/view/8383/numeric-zero-padding-file-rename
+dmesg -T|sed -e 's|\(^.*'`date +%Y`']\)\(.*\)|\x1b[0;34m\1\x1b[0m - \2|g' # dmesg with colored human-readable dates
+namei -m $(pwd) # Show permissions of current directory and all directories upwards to /
+ -> dir=$(pwd); while [ ! -z "$dir" ]; do ls -ld "$dir"; dir=${dir%/*}; done; ls -ld /
+ #~SOURCE: http://www.commandlinefu.com/commands/view/11037/show-permissions-of-current-directory-and-all-directories-upwards-to-
+sort -g -o list.txt{,} # sort the contents of a text file in place
+ -> sort -g -o list.txt !#:$ # history expansion
+ -> sort -g list.txt -o !#:2
+ -> sort -g list.txt -o !^ # '!^' => first arg; '$_' => last arg
+bind -P | grep -v "is not" | sed -e 's/can be found on/:/' | column -s: -t # List all bash shortcuts
+compgen -A function # List bash functions defined in .bash_profile or .bashrc
+ -> declare -F | cut -d ' ' -f 3
+ -> typeset -f
+ -> set | fgrep " ()"
+ -> declare -F | sed 's/^declare -f //'
+nmap -sP 192.168.1.0/24; arp -n  | grep "192.168.1.[0-9]* *ether" # find all active IP addresses in a network
+tail -f file | while read; do echo "$(date +%T.%N) $REPLY"; done # Annotate tail -f with timestamps
+ -> tail -f file | ts '%H:%M:%.S'
+for i in ?.ogg; do mv $i 0$i; done # convert single digit to double digits
+ -> rename 's/\d+/sprintf("%02d",$&)/e' -- $@
+(find /one -print0; find /two -print0)|tar cvf backup.tar --null -T - # Use a subshell to generate a complex list of files for tar
+dpkg --print-architecture
+mat -d /path/to/file.jpg
+findmnt
+lscpu || chcpu
+tarcat # concatenates the pieces of a GNU tar multi-volume archive
+while :; do play -qn synth sin 14k trim 0 0.75 vol .8 ; sleep $((RANDOM % 4 + 3))m ; done # Poor man's annoy-a-tron. 3 - 6 min interval.
+rename 's/_(\d{4})(\d{2})(\d{2}).txt/_$1-$2-$3.txt/' *_????????.txt # Rename set of files with non-hyphenated date to be hyphenated.
+base64 -d<<<TVRoZAAAAAYAAQABAYBNVHJrAAAAOgD/UQOAAAAAkEV/CIBFfwCQRX8IgEV/AJBKfwiASn8AkEx/CIBMfwqQSX8IgEl/AJBKfwiASn//LwA= |timidity - # Log!
+cut -c1-3 boot.log | uniq -c # (Unrotated log) Count the number of lines per month in boot.log.
+du -ch --exclude=./relative/path
+apt-get install bvi # binary vi
+echo "ibase=10;obase=16;500000"|bc # ibase = input base 10; obase = output base 16 => 7A120 => 07 A1 20
+
+==June 2015==
+gpg --gen-random --armor 1 8  # generate a random password n characters long
+ -> strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 30 | tr -d '\n'; echo
+ -> strings /dev/urandom | tr -cd '[:alnum:]' | fold -w 30 | head -n 1
+ -> pwgen 8 1
+ -> cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 8
+ -> openssl rand -base64 8
+ps -e -o pcpu,cpu,nice,state,cputime,args --sort pcpu | sed "/^ 0.0 /d" # Processes by CPU usage
+ -> top -b -n 1 | sed 1,6d
+function google { Q="$@"; GOOG_URL='https://www.google.de/search?tbs=li:1&q='; AGENT="Mozilla/4.0"; stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}${Q//\ /+}" | grep -oP '\/url\?q=.+?&amp' | sed 's|/url?q=||; s|&amp||'); echo -e "${stream//\%/\x}"; } # Google verbatim search on your terminal
+ -> Q="YOURSEARCH"; GOOG_URL="http://www.google.com/search?q="; AGENT="Mozilla/4.0"; stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}\"${Q/\ /+}\"" | grep -oP '\/url\?q=.+?&amp' | sed 's/\/url?q=//;s/&amp//'); echo -e "${stream//\%/\x}"
+twistd -n web --path . # Serve current directory tree at http://$HOSTNAME:8080/
+ -> python -m SimpleHTTPServer
+echo $(($(blockdev --getsz /dev/sdXXX)*512/4096 - 35)) # Calculate the block number at the end of the drive
+tree -a -L 1 --inodes /path # Display inodes
+xxd -p source | fold -w2 | paste -sd' ' | sed "s/A/B/g" | xxd -p -r > destination # Binary search/replace
+cmp -l foo.mid bar.mid | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), strtonum(0$3)}' # Binary diff
