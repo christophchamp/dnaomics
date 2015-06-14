@@ -385,7 +385,6 @@ rename 's/_(\d{4})(\d{2})(\d{2}).txt/_$1-$2-$3.txt/' *_????????.txt # Rename set
 base64 -d<<<TVRoZAAAAAYAAQABAYBNVHJrAAAAOgD/UQOAAAAAkEV/CIBFfwCQRX8IgEV/AJBKfwiASn8AkEx/CIBMfwqQSX8IgEl/AJBKfwiASn//LwA= |timidity - # Log!
 cut -c1-3 boot.log | uniq -c # (Unrotated log) Count the number of lines per month in boot.log.
 du -ch --exclude=./relative/path
-apt-get install bvi # binary vi
 echo "ibase=10;obase=16;500000"|bc # ibase = input base 10; obase = output base 16 => 7A120 => 07 A1 20
 
 ==June 2015==
@@ -410,4 +409,32 @@ cmp -l foo.mid bar.mid | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), st
  #   -An removes the address column. This is important otherwise all lines would differ after a byte addition / removal.
  #   -w1 puts one byte per line, so that diff can consume it.
  #   -tx1 is the representation you want, change to any possible value, as long as you keep 1 byte per line.
-
+sort -V ipv4addrs.txt # In GNU sort, you can use -V (version sort) to also sort IPv4 addresses numerically according to each class.
+find /dev/disk/by-id -type l -printf "%l\t%f\n" | cut -b7- | sort # Show drive names next to their full serial number (and disk info)
+grep MemTotal: /proc/meminfo | awk '{printf("MemTotal: %d MB\n", $2/1024)}' # Display how much memory install on system
+nmcli connection status <UUID> # network connection status
+if [[ $(expr $(date +%s) - $(stat -c %X /var/lib/apt/periodic/update-success-stamp)) -gt 86400 ]]; then # debian based OS update apt/dpkg only if it hasn't been updated in N time
+printf '=%.0s' {1..100} # repeat a character
+cat -vet file.txt # show non-Unix characters
+ -> tr -d '\r' < file.txt # delete "cr" characters
+YOUTUBE: allinurl:[your word here] site:youtube.com/watch
+du -h *.png --total|tail -n1
+identify -format "%wx%h" image.png # get image dimensions
+ -> php -r "print_r(getimagesize('/path/to/image.png'));"
+ -> mediainfo image.png
+ -> exiftool image.png
+ -> exiv2 image.png
+ -> feh -l image.png
+ -> less image.png # less (with lessfile/lesspipe) displays image info by using ImageMagick in the background
+ -> convert image.jpg -print "Size: %wx%h\n" /dev/null
+echo $((0xff)) # => 255 # convert hexademicals
+echo $PATH | sed 's/\(\/[^:]*\).*/\1/g' # get first path
+echo "foo bar baz" | sed 's/\(\b[a-z]\)/\(\1\)/g' # => (f)oo (b)ar (b)az
+echo $var | grep -Eq "^[0-9]{1,}$"; echo $? # check if $var is an integer
+ -> if [[ $(echo "$var" | grep -Eq "^[0-9]{1,}$"; echo $?) -ne 0 ]]; then echo "$var" is not a number; exit 1; fi
+# cacademo || cacafire || img2txt -W 30 -f html tux.png > tux.html || cacaview tux.png
+cat /proc/cmdline # view current arguments passed to kernel at boot time
+bvi foo.png # binary vim
+ -> dhex foo.png
+lnav # ncurses-based log file viewer <http://lnav.org/>
+pkexec # Execute a command as another user
