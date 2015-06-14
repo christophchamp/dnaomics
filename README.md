@@ -1,6 +1,7 @@
 # dnaomics
 > a set of bioinformatics utilities
 
+NOTE: The included files are not just related to bioinformatics.
 
 ## Source code
 
@@ -28,4 +29,4 @@
 
 Christoph Champ<br/>
 http://www.christophchamp.com<br/>
-Last update: 2014-07-28
+Last update: 2015-06-14
