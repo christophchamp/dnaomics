@@ -349,6 +349,9 @@ sed -e "/$USER/d;s/:.*//g" /etc/group # Tells which group you DON'T belong to (o
 while true; do X=$Y; sleep 1; Y=$(ifconfig eth0|grep RX\ bytes|awk '{ print $2 }'|cut -d : -f 2); echo "$(( Y-X )) bps"; done # Measures download speed on eth0
 openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//' # Generate a Random MAC address
  -> hexdump -n6 -e '/1 ":%02X"' /dev/random|sed s/^://g
+ -> hexdump -e '1/1 "%02X" ":"' /dev/urandom -n 6 | head -c 17 # Sometimes prints "*"!
+    -> for i in `seq 1 10`; do hexdump -e '1/1 "%02X" ":"' /dev/urandom -n 6 && echo -e "\n" | head -c 17; done
+    -> head -c 6 /dev/urandom | hexdump -C | head -n 1 | cut -d  ' ' -f 3-8 | tr ' ' ':' # No "*"s!
  -> od -An -N10 -x  /dev/random  | md5sum | sed -r 's/^(.{10}).*$/\1/; s/([0-9a-f]{2})/\1:/g; s/:$//;'
  #~SOURCE: http://www.commandlinefu.com/commands/view/6619/generate-a-random-mac-address
 rename 's/\d+/sprintf("%04d",$&)/e' *.jpg # Numeric zero padding file rename
@@ -438,3 +441,41 @@ bvi foo.png # binary vim
  -> dhex foo.png
 lnav # ncurses-based log file viewer <http://lnav.org/>
 pkexec # Execute a command as another user
+telnet towel.blinkenlights.nl # ASCII "Star Wars"
+asciiquarium
+factor 55 # get the prime factors of any number
+figlet LINUX # ASCII art
+fortune -s # get a fortune
+hash # print out how many times you have used a given command for the given shell session
+hello # friendly greeting program
+cmatrix # simulates the display from "The Matrix"
+s2ram # suspend laptop <http://suspend.sourceforge.net/>
+[ $( date -d 'next day' +%d ) == 1 ] && echo 'its the end of the month' # True on last day of the month. Useful in cron and other places.
+strings -n1 file.bin # By default, strings will only show data if there are 4 or more consecutive ASCII chars, you can reduce this with -n
+date -d "$(grep finish /proc/mdstat |sed -e 's/^.*finish=//;s/ .*$//;s/\..*$//')min" # Figure out when your md-raid will finish.
+for mc in http://goo\.gl/{A,a}{B,b}9{X,x}0 ; do curl -sI $mc | grep Location: && echo $mc ; done # Try all upper/lower case combos of url.
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+head -c 32 /dev/random | base64 # generate a random 32-character string
+for i in $( ls | grep [A-Z] ); do mv -i $i `echo $i | tr 'A-Z' 'a-z'`; done # rename all filenames from upper- to lower-case
+watch -n1 'ps -p 1761 -o pid,comm,etime,cmd' # watch a given PID
+ls *[![:lower:]] # Any filename that does not end with a lowercase letter.
+ -> [[:upper:]][[:upper:]]*
+ -> BACKUP.[[:digit:]][[:digit:]]
+ -> foo???
+for i in $(seq -f "%05g" 10 15); do echo $i; done
+
+# Rename:
+# FROM: "Introduction___Networking_tutorial_(1_of_13)-qHzZUmP1vvON.mp4"
+#   TO: "nettut-01_of_13_-_Introduction-qHzZUmP1vvON.mp4"
+for f in *.mp4; do \
+  [[ $f =~ ^(.*)___Networking_tutorial_\(([0-9]+)_of_13\)-(.*)$ ]]
+  mv "$f" "nettut-$(printf "%02d" ${BASH_REMATCH[2]})_of_13_-_${BASH_REMATCH[1]}-${BASH_REMATCH[3]}"
+done
+
+echo $(($((`date +%s`/86400))-$(sudo awk -F: /^root/'{print $3}' /etc/shadow))) # number of days since the root password was last changed
+for file in *.txt; do mv "$file" "${file/ (*)/}"; done # rename all "001 (1).txt"-type files to "001.txt" (i.e., remove parentheses)
+ -> ls -d -- *\(*\)* | sed 's/\(.*\) (.*)\(.*\)/mv -- "&" "\1\2"/'
+ -> rename -v 's/ \(.*\)\./\./' ./*.txt
+ #see_also: http://linux.icydog.net/rename.php
+tmux new-session \; split-window -l 5 -d 'tail -F /var/log/syslog' # New tmux session, split window w/ 5 (4) line tail of syslog at bottom.
+[?] ack -l 'searchedString' | xargs -o -p -n8 vim -p # Open files containing "searchedString" in Vim tabs, eight at a time
