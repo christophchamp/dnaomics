@@ -479,3 +479,57 @@ for file in *.txt; do mv "$file" "${file/ (*)/}"; done # rename all "001 (1).txt
  #see_also: http://linux.icydog.net/rename.php
 tmux new-session \; split-window -l 5 -d 'tail -F /var/log/syslog' # New tmux session, split window w/ 5 (4) line tail of syslog at bottom.
 [?] ack -l 'searchedString' | xargs -o -p -n8 vim -p # Open files containing "searchedString" in Vim tabs, eight at a time
+zcat large.log.gz | awk '{print $0 | "gzip -v9c > large.log-"$1"_"$2".gz"}' # Breakup compressed log by syslog date and recompress. #awksome
+gzip -c large.log | ssh user@hostwithbigdisk 'cat > /dir/large.log.gz' # Compress and ssh transfer a log that has filled a filesystem.
+du -s $( date -d "yesterday" +/netflow/%Y/%m/%d ) # Check the size of yesterday's netflow data directory using date format technique.
+pmap PID -x
+alias hideprev='history -d $((HISTCMD-2)) && history -d $((HISTCMD-1))' # Hide the previous command you just ran
+montage -size 1500x$((300 / 6 + 1)) xc:{red,orange,yellow,green,blue,indigo} -mode Concatenate -tile 1x twitter.png # pride flag!
+touch -- -file_starts_with_dash.txt && rm -- -file_starts_with_dash.txt
+rm !(*.c|*.py) # remove all files in cwd _except_ *.c and *.py files
+touch -d "2am" two_am.txt && touch -d "yesterday" gestern.txt # create files with timestamps at a specific date/time (verify with `stat`)
+find . -newer ../temp1 ! -newer ../temp2 -exec cp '{}' ./bkup/ ';' # cp all files newer than temp1 but older than temp2 into /bkup
+touch -d "9am" start.tmp && touch -d "5pm" end.tmp; find . -newer start.tmp ! -newer end.tmp -exec cp {} /path/to/bkup \; # copy all files in a given directory that were modified during your current workday (e.g., those changed between 9am and 5pm today)
+dd if=/dev/zero of=/tmp/output.img bs=8k count=256k conv=fdatasync; rm -rf /tmp/output.img # test disk write speed
+man $(ls /bin | shuf | head -1) # display a random man page
+!!:gs/foo/bar # repeat last command but globally replace 'foo' with 'bar'
+ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq /tmp/out.mpg # Capture video of your desktop
+ #   -f x11grab makes ffmpeg to set the input video format as x11grab. The X11 framebuffer has a specific format it presents data in and it makes ffmpeg to decode it correctly.
+ #   -s wxga makes ffmpeg to set the size of the video to wxga which is shortcut for 1366x768. This is a strange resolution to use, I'd just write -s 800x600.
+ #   -r 25 sets the framerate of the video to 25fps.
+ #   -i :0.0 sets the video input file to X11 display 0.0 at localhost.
+ #   -sameq preserves the quality of input stream. It's best to preserve the quality and post-process it later.
+ # You can also specify ffmpeg to grab display from another x-server by changing the -i :0.0 to -i host:0.0.
+ffmpeg|avconv -i input.flv output.mp3
+ -> avconv -i input.flv -ab 32k output.mp3
+echo cmd | at midnight # Execute a command at midnight
+dd if=/dev/dsp | ssh username@host dd of=/dev/dsp # Output your microphone to other computer's speaker
+ffmpeg|avconv -f oss -i /dev/dsp output.mp3 # record audio from your laptop's mic
+ -> cat /dev/dsp >outputfile; cat outputfile > /dev/dsp
+[?]sox -t ossdsp -c 2 -w -s -r 44100 /dev/dsp -t wav - | oggenc - -o test.ogg
+ -> sox -t ossdsp -c 2 -w -s -r 44100 /dev/dsp -t wav - | lame -h -k - test.mp3
+cat </dev/tcp/time.nist.gov/13 # get current UTC time from NIST.gov
+
+# Download a URL:
+$ exec 5<>/dev/tcp/www.xtof.ch/80
+$ echo -e "GET / HTTP/1.0\n" >&5
+$ bash$ cat <&5
+
+http://www.tldp.org/LDP/abs/html/procref1.html # /proc informatioin
+
+mount -t tmpfs -o size=1024m tmpfs /mnt # Create and mount a temporary RAM partition
+find /proc/${PID}/exe -printf '%l\n' # Find the name of the process running under the given PID
+netstat -s | grep "packets received"
+procinfo
+ssh user@host cat /path/to/remotefile | diff /path/to/localfile - # Compare a remote file with a local file
+curl -u user:pass -d status='Tweeting from the shell' http://twitter.com/statuses/update.xml # tweet from CLI
+man 7 ascii
+
+http://www.catonmat.net/blog/yet-another-ten-one-liners-from-commandlinefu-explained/
+http://www.catonmat.net/blog/another-ten-one-liners-from-commandlinefu-explained/
+http://unix.stackexchange.com/questions/6/what-are-your-favorite-command-line-features-or-tricks
+http://www.tldp.org/LDP/abs/html/index.html
+
+rpcinfo
+
+img2txt -W 20 ~/tmp/tstorms.png
