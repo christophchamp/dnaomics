@@ -533,3 +533,115 @@ http://www.tldp.org/LDP/abs/html/index.html
 rpcinfo
 
 img2txt -W 20 ~/tmp/tstorms.png
+
+==July 2015==
+type eval
+find / \( -nouser -o -nogroup \) -ls # Find files on the entire filesystem for which there is no corresponding user or group.
+echo -e "\xE2\x98\xA0" # echo unicode characters in console
+ -> echo -n ☠ | hexdump -C
+ -> echo -e '\u2234'
+ -> echo ü | hexdump | awk '{print "\\x"toupper(substr($2,3,4)) "\\x"toupper(substr($2,0,2)) "\\x"toupper(substr($3,3,4))}' | head -1
+ -> echo -e "\U02620" | xxd # => "0000000: e298 a00a" => "e2 98 a0"; convert to HEX
+ -> printf "%b" '\U02620\n'
+showconsolefont # Show the current EGA/VGA console screen font
+unicode_start || unicode_stop
+gucharmap
+meld # Visual diff and merge tool for the GNOME Desktop
+[?] xe(){ curl "http://www.xe.com/wap/2co/convert.cgi?Amount=$1&From=$2&To=$3" -A "Mozilla" -s | sed -n "s/.*>\(.*\) $3<.*/\1/p";} # Currency converter using xe.com
+find ~/podcasts -type f -mtime +7 -delete # Delete podcasts older than 7 days.
+convert -delay 20 -loop 0 *.jpg newgif.gif # Make a gif out of all jpg's in a directory
+grep "phpmyadmin" $path_to_access.log | grep -Po "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" | sort | uniq | xargs -I% sudo iptables -A INPUT -s % -j DROP # Ban all IPs that attempted to access phpmyadmin on your site
+ifconfig -a | grep -Po '\b(?!255)(?:\d{1,3}\.){3}(?!255)\d{1,3}\b' | xargs nmap -A -p0- # Nmap scan every interface that is assigned an IP
+(echo 'GET /'; echo; sleep 1; ) | telnet www.google.com 80 # Download a file from a webserver with telnet 
+ -> /usr/bin/printf 'GET / \n' | nc www.google.com 80
+wmctrl -pl | grep $(pidof mpv) | cut -d'-' -f2- # Prints the window title of current mpv session to display what is playing
+vim +'set ff=unix' +wq file.txt # dos2unix
+ -> tr -d '\r' < input.file > output.file
+ -> perl -pi -e 's/\r\n/\n/g' input.file
+ -> sed 's/$'"/`echo \\\r`/" input.txt > output.txt # unix2dos
+ -> sed 's/^M$//' input.txt > output.txt
+find . -type f  -name '*.java' -exec sh -c 'iconv -f cp1252 -t utf-8 "$1" > converted && mv converted "$1"' -- {} \; # Change the encoding of all files in a directory and subdirectories
+atq | sed 's_\([0-9]\{1,8\}\).*_\1_g' | xargs atrm # Remove all `at` jobs
+curl -s http://cbsg.sourceforge.net/cgi-bin/live | grep -Eo '^<li>.*</li>' | sed s,\</\\?li\>,,g | shuf -n 1 # Corporate random bullshit generator (cbsg)
+tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | fmt # Generate random text
+i=$(curl -s server/nginx_stats); IFS=$'\n'; i=($i); a=${i[0]/Active connections: } && a=${a/ }; r=${i[2]# [0-9]* [0-9]* }; echo "Active: $a, requests: $r" # Parse nginx statistics output
+fac() { (echo 1; seq $1) | paste -s -d\* | bc; } # Compute factorial of positive integer <http://www.bashoneliners.com/oneliners/oneliner/195/>
+__=`sensors | grep Core` && echo \(`echo $__ | sed 's/.*+\(.*\).C\(\s\)\+(.*/\1/g' | tr "\n" "+" | head -c-1`\)\/`echo $__ | wc -l` | bc && unset __ # Get average CPU temperature from all cores.
+lsof / | awk '{ if($7 > 1048576) print $7/1048576 "MB" " " $9 " " $1 }' | sort -n -u | tail # Show 10 largest open files
+dig +short myip.opendns.com @resolver1.opendns.com # Extract your external IP address
+ -> curl ipecho.net/plain
+ -> curl icanhazip.com
+ -> curl curlmyip.com
+ -> curl l2.io/ip
+ -> curl ip.appspot.com
+ -> curl ifconfig.me/ip  # JSON: curl ifconfig.me/all.json
+sed -i 18d .ssh/known_hosts # Remove offending key from known_hosts
+[[ $(find /path/to/file -type f -size +51200c 2>/dev/null) ]] && echo true || echo false # Check if a file exists and has a size greater than X
+git ls-files | xargs wc -l | awk -F ' +|\\.|/' '{ sumlines[$NF] += $2 } END { for (ext in sumlines) print ext, sumlines[ext] }' # Count the lines of each file extension in a list of files
+find /some/path -type f ! -perm -111 -ls # Find files that are not executable
+resolveip -s www.xtof.ch # resolve hostname to IP our vice versa with less output
+tail -f FILE | perl -pe 's/KEYWORD/\e[1;31;43m$&\e[0m/g' # coloured tail
+cat somefile.css | awk '{gsub(/{|}|;/,"&\n"); print}' >> uncompressed.css # Uncompress a CSS file
+nslookup -q=txt -class=CHAOS version.bind NS.PHX5.NEARLYFREESPEECH.NET # Check version of DNS Server
+find /var/logs -name * | xargs tar -jcpf logs_`date +%Y-%m-%e`.tar.bz2 # Archive every file in /var/logs
+curl -s http://www.mininova.org/rss/ubuntu | xmlstarlet sel -N atom="http://www.w3.org/2005/Atom" -t -m './/enclosure' -v '@url' -n | wget -i - # Read RSS from CLI
+df -lP | awk '{sum += $3} END {printf "%d GiB\n", sum/2^20}' # sum filesytem used space
+ -> df -lP | numsum -3 | numprocess /%$(( 2**20 ))/
+convert -density 300 IN.eps -resize 600x400 -transparent white OUT.png # convert from PostScript to PNG
+espeak "Hello"
+mailq |awk '/^[0-9A-F]+/{print $1}' |while read id; do postcat -q $id |grep -qi 10\.4\.5\.6 && postsuper -d $id;done # Rm msgs from Q by IP
+find . -mmin -60 -xdev -ls # Find less than an hour old files in CWD or below without crossing into other partitions. (-xdev)
+echo "hello, climagic" | od -t x1 -A"n" | tr "\n" " " | tr -d " " # hexdump-stream
+seq 0 9 | shuf -n 1 # range random
+less -S <text_file> # wordwrap for less
+let "rand = RANDOM % 9"; echo $rand # Range random
+watch -n .2 <bash_script> # Crude live testing script as you save
+tput rmam; <any-command>; tput smam # disable wordwrap
+cat file1 | tr "[A-Z]" "[a-z]"  # Change all uppercase letters in a file to lowercase
+vimtutor # Learn to use vim
+cut -f 1 -d: /etc/passwd # Get the usernames from /etc/passwd
+ps -ef | grep defunct | awk '{print $2}' | xargs kill # Kill defunct processes
+watch -n 5 "ls -l something.pid" # Check every 5 seconds if something.pid exits and it's last access and size
+for i in {1..254}; do host 192.168.0.$i; done # Do a reverse DNS lookup of all hosts in 192.168.0.0/24
+tcpdump -ni eth0 icmp # Check if this machine is being pinged
+egrep -o "\b[a-zA-Z0-9\.\+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+\b" mbox | sort -u # Get a List of all Emailadresses in your MBox file.
+cat list | sed -e "N;N;s/\n/,/g" > list.csv # Collapse groups of 3 lines to 1 line and seperate the values by commas
+export TMOUT=300 # terminate the shell if no activity in 5 minutes, security people like this on ssh connections
+gem install cheat; cheat strftime # get cheat sheets on popular topics from http://cheat.errtheblog.com
+put "git blame $@" into ~/bin/git-praise and now you can run 'git praise' instead of 'git blame'
+cat http://bigfile.zip  | funzip | grep alice > alice.txt # funzip can uncompress piped zipfiles
+LC_ALL=C grep -F pattern file # speed up grep with a fixed string search and optimal localization
+seq 9 | pr -tas" " --columns 3 # fold a file into 3 columns (row ordering)
+ -> seq 9 | pr -ts" " --columns 3 # fold a file into 3 columns (column ordering)
+tr '"' "'" < file # replace double quotes with single quotes without the usual quoting nightmare
+tac log | less # page through a log file in reverse to avoid guessing number of lines to tail
+uniq -w 12 -c log # use uniq to count lines with common prefixes. For example timestamps in log files
+rev file | column -t | rev # print a file in a tabular format (right align). Set delimiter with -s
+ -> column -t file # print a file in a tabular format (left align). Set delimiter with -s
+echo "two" | cat -nE one - three
+TZ=America/Chicago date '+%FT%T.%N%:z'
+ -> perl -MPOSIX -le '$t=strftime "%Y-%m-%dT%T%z", localtime; $t =~ s/..$/:$&/; print $t'
+ -> date --rfc-3339=seconds
+openssl s_client -connect google\.com:443 # telnet / tcp debugging via SSL
+while read -d $'\0' -r file; do printf 'File found: '"'%s'"'\n' "$file"; done < <(find . -iname '*type*' -print0)
+ -> find . -maxdepth 1 -type f -print0 | xargs -0 -I@ echo @ | sed -n '/type/p'
+ -> find . -maxdepth 1 -type f -print0 | while IFS= read -r -d '' -r myfile; do echo "${myfile}" | sed -n '/type/p'; done
+ -> find . -type f -name '*.*' -printf '%p\0' | tar --null -uf archive.tar -T -
+ -> find . -maxdepth 1 -name '*.mp4' -exec sh -c 'echo "$0"' {} \;
+ -> find -exec cmd 1 {} ";" -exec cmd 2 {} ";"
+ -> while read -rd $'\0' file; do
+      something with "$file"
+    done < <(find  . -type f -name '*.*' -print0)
+ -> exec 9< <( find "$absolute_dir_path" -type f -print0 )
+    while IFS= read -r -d '' -u 9; do
+        file_path="$(readlink -fn -- "$REPLY"; echo x)"
+        file_path="${file_path%x}"
+        echo "START${file_path}END"
+    done
+echo -e "foo\nbar\nbaz\n"| tee >(grep o > o.out) >(grep r > r.out) >(grep z > z.out) > /dev/null # http://mywiki.wooledge.org/ProcessSubstitution
+ -> (echo "YES")> >(read str; echo "1:${str}:first";)> >(read sstr; echo "2:$sstr:two")> >(read ssstr; echo "3:$ssstr:three") # http://wiki.bash-hackers.org/syntax/expansion/proc_subst
+lynx --dump http://www.whatismyasn.org/
+for f in images/*.JPG; do t=${f##*/}; convert $f -resize 640 ${t%.JPG}.png; done # reduce image size for websites
+du -sh */ | sort -h # Show directory size and sort by human readable amount (MB, GB, etc.). Requires fairly recent version of GNU sort.
+tr A-Za-z N-ZA-Mn-za-m <<<"Guvf Gjrrg sebz @pyvzntvp unf orra jvguuryq va erfcbafr gb n ercbeg sebz gur pbclevtug ubyqre" # rot13
+
