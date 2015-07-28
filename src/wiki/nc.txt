@@ -12,3 +12,6 @@ GET / HTTP/1.1
 Host: www.climagic.org
 User-Agent: climagic
 
+# Pushing 5Gbps over an 1Gbps network:
+ [client]$ tar cvf - dir/|lz4c |netcat server 12345
+ [server]$ netcat -l -p 12345|lz4 -d -|tar xv
