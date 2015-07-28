@@ -1,0 +1,10 @@
+Headless Operation
+
+* To convert a Word .docx file to HTML, run the following command (LibreOffice must not be open in a graphical environment when you try to do this):
+
+ $ libreoffice --headless --convert-to html foobar.docx
+
+* To convert the same document to .odt format, run this command.
+
+ $ libreoffice --headless --convert-to odt foobar.docx
+
