@@ -1,1 +1,5 @@
 encfs ~/.random/ /path
+fusermount -u /path
+
+==External links==
+* [https://wiki.archlinux.org/index.php/EncFS EncFS] on ArchWiki
