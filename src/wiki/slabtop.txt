@@ -1,0 +1,5 @@
+slaptop
+
+==External links==
+* [https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Tuning_and_Optimizing_Red_Hat_Enterprise_Linux_for_Oracle_9i_and_10g_Databases/sect-Oracle_9i_and_10g_Tuning_Guide-Enabling_Asynchronous_IO_and_Direct_IO_Support-Verifying_Asynchronous_IO_Usage.html Verifying Asynchronous I/O Usage]
+* [http://man7.org/linux/man-pages/man7/aio.7.html aio - POSIX asynchronous I/O overview]
