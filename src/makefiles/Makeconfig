@@ -1,0 +1,16 @@
+# by Christoph Champ, 12-Oct-2006
+
+SHELL 	= /bin/sh
+
+BUILDDIR	= perl5.004_04
+BASE	:= $(word 1,$(ATLAS) $(ATLAS_ROOT) /afs/cern.ch/atlas)
+UNAME	:= $(shell uname)
+ARCH	= `uname -p`
+VERSIONSH	= echo ${BUILDDIR} | sed 's/^perl//'
+VERSION	= ${VERSIONSH:sh}
+#REV:sh	= test -f .revision || echo 0 > .revision ; REVSH=`cat .revision` ;
+REV	= test -f .revision || echo 0 > .revision ; REVSH=`cat .revision` ;\
+	REVSH=`expr $REVSH + 1`; echo $REVSH > .revision ; echo $REVSH
+TIME	:= $(shell date +%H%M)
+DATE	:= $(shell date +%y%m%d)
+

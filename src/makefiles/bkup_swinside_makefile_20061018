@@ -1,0 +1,169 @@
+# protein-protein docking prep. makefile
+# by Christoph Champ, 12-Oct-2006
+include /home/champ/bin/makefiles/Makeconfig
+
+#SHELL 	= /bin/sh
+#
+#BUILDDIR	= perl5.004_04
+#BASE	:= $(word 1,$(ATLAS) $(ATLAS_ROOT) /afs/cern.ch/atlas)
+#UNAME	:= $(shell uname)
+#ARCH	= `uname -p`
+#VERSIONSH	= echo ${BUILDDIR} | sed 's/^perl//'
+#VERSION	= ${VERSIONSH:sh}
+##REV:sh	= test -f .revision || echo 0 > .revision ; REVSH=`cat .revision` ;
+#REV	= test -f .revision || echo 0 > .revision ; REVSH=`cat .revision` ;\
+#	REVSH=`expr $REVSH + 1`; echo $REVSH > .revision ; echo $REVSH
+#TIME	:= $(shell date +%H%M)
+#DATE	:= $(shell date +%y%m%d)
+
+# ======================================================================
+AWK	= awk
+SED	= sed
+RM	= rm
+LA	= foo
+CH	= E
+# ======================================================================
+# Useful utilities:
+#	cat cmp cp diff echo egrep expr false grep install-info
+#	ln ls mkdir mv pwd rm rmdir sed sleep sort tar test touch true
+#
+#	[ basename bash cat chgrp chmod chown cmp cp dd diff echo
+#	egrep expand expr false fgrep find getopt grep gunzip gzip
+#	hostname install install-info kill ldconfig ln ls md5sum
+#	mkdir mkfifo mknod mv printenv pwd rm rmdir sed sort tee
+#	test touch true uname xargs yes
+
+# Clear out pre-defined suffixes
+.SUFFIXES:
+.SUFFIXES:	.seg .pdb .dat .log .mat .png .fa .fsa
+
+# ExtractSeg.sh, by Christoph Champ 10-Oct-2006
+# # Extract segments from TLSMD log file
+#%.seg:	%.log
+#	echo $* | \
+#	$(SED) -n '/^[0-9]/{n;p;}' $< | \
+#	$(SED) -e 's/  [0-9].*\.\(.*\)//' | \
+#	head -${LO} | \
+#	tail -1 | \
+#	$(SED) 's/[)|;]/\n/g' - | \
+#	head -$(HI) | \
+#	$(SED) 's/[(('$(CH)':)| ]//g' - | \
+#	$(SED) 's/-/\t/g' - | \
+#	sort -nk1 - | \
+#	$(SED) = - | $(SED) 'N;s/\n/\t/' >$@
+
+%.seg:	%.log
+	$(SED) -n '/^[0-9]/{n;p;}' $< | \
+	$(SED) -e 's/  [0-9].*\.\(.*\)//' >$@
+
+# Extract individual segments from the TLSMD log output
+#$(SED) 's/[(('$(CH)':)| ]//g' - | 
+SEG	= 01 02 03 04 05
+%.seg.s:	%.seg
+	for n in $(SEG);\
+	do \
+	head -$$(expr $$n - 1) $< | \
+	tail -1 | \
+	$(SED) 's/[)|;]/\n/g' - | \
+	head -$$n | \
+	$(SED) 's/[(('$(shell basename $< .seg | sed -r "s/t[A-Z0-9]{4}-[A-Za-z]{3}_//")':)| ]//g' - | \
+	$(SED) 's/-/\t/g' - | \
+	sort -nk1 - | \
+	$(SED) = - | $(SED) 'N;s/\n/\t/' >$@$$n ;\
+	done
+
+PDB	= .pdbid
+# Download PDB from rcsb (by pdb id)
+%.pdb:	%.pdbid
+	wget http://www.rcsb.org/pdb/files/$(shell basename $< $(PDB)).pdb.gz
+	wait
+	gunzip $(shell basename $< $(PDB)).pdb.gz
+
+# PDB-to-MATRIX: Translate PDB file x,y,z to contact matrix
+%.pdb.mat:	%.pdb
+	cat $< | perl -e '$$count=$$i=$$j=0;while($$line=<STDIN>){@line=split(/\s+/,$$line);\
+	if($$line=~ /^ATOM/){push @field,[@line];$$count++;}}\
+	print("MATRIX\t");for($$i=0;$$i<$$count;$$i++){printf("E%-2d\t",$$i+1);}print("\n");\
+	for($$i=0;$$i<$$count;$$i++){printf("E%-2d\t",$$i+1);for($$j=0;$$j<$$count;$$j++){\
+	$$r=sqrt(($$field[$$i][6]-$$field[$$j][6])**2+($$field[$$i][7]-$$field[$$j][7])**2+($$field[$$i][8]-$$field[$$j][8])**2);\
+	printf("%5.2f\t",$$r);}print("\n");}' - >$@
+
+# MATRIX-to-PNG: Generate a PNG from a matrix file
+%.pdb.mat.png:	%.pdb.mat
+	`/home/champ/bin/matrix2png -data $< -size 8:8 -mincolor darkred -maxcolor white -c -r -s -con 4.0 >$@`
+
+# PDB-to-FASTA(aa): Translate PDB file to FASTA(amino acid) sequence file
+%.fa:	%.pdb
+	@echo ">$@" >$@ | \
+	cat $< | perl -e '$$prevres="";$$prevresnum=0;\
+	while(<STDIN>){if(/^ATOM/){if(substr($$_,13,2) eq "CA"){$$currentres=substr($$_,17,3);$$currentresnum=substr($$_,22,5);\
+	$$currentresnum=~ s/\s//g;if($$prevres ne $$currentres || $$prevresnum ne $$currentresnum){push(@aas,substr($$_,17,3));}\
+	$$prevres=$$currentres;$$prevresnum=$$currentresnum;}}elsif(/^END/){}}\
+	%symbols=("ALA","A","CYS","C","ASP","D","GLU","E","PHE","F","GLY","G","HIS","H","ILE","I","LYS","K",\
+	"LEU","L","MET","M","MSE","M","ASN","N","PRO","P","GLN","Q","ARG","R","SER","S","THR",\
+	"T","VAL","V","TRP","W","TYR","Y","GLX","Z");\
+	for($$i=0;$$i<@aas;$$i++){print $$symbols{$$aas[$$i]};}print"\n";' - |\
+	sed -e 's/\(.\{60\}\)/\1\n/g' - >>$@
+
+# FASTA(DNA)-to-FASTA(aa): Translate DNA sequences into amino acid sequences
+%.fsa:	%.fa
+	cat $< | perl -ne 'chomp;push @seq,$$1 if /^(>.*)/; $$dna{$$seq[$$#seq]} .= $$1 if (/^([A-Z]+)$$/);\
+	%base2aa=("AAA"=>"K","AAC" =>"N","AAG"=>"K","AAT"=>"N","ACA"=>"T","ACC"=>"T","ACG"=>"T", \
+	"ACT"=>"T","AGA"=>"R","AGC"=>"S","AGG"=>"R","AGT"=>"S","ATA"=>"I","ATC"=>"I","ATG"=>"M", \
+	"ATT"=>"I","CAA"=>"Q","CAC"=>"H","CAG"=>"Q","CAT"=>"H","CCA"=>"P","CCC"=>"P","CCG"=>"P", \
+	"CCT"=>"P","CGA"=>"R","CGC"=>"R","CGG"=>"R","CGT"=>"R","CTA"=>"L","CTC"=>"L","CTG"=>"L", \
+	"CTT"=>"L","GAA"=>"E","GAC"=>"D","GAG"=>"E","GAT"=>"D","GCA"=>"A","GCC"=>"A","GCG"=>"A", \
+	"GCT"=>"A","GGA"=>"G","GGC"=>"G","GGG"=>"G","GGT"=>"G","GTA"=>"V","GTC"=>"V","GTG"=>"V", \
+	"GTT"=>"V","TAA"=>"-","TAC"=>"Y","TAG"=>"-","TAT"=>"Y","TCA"=>"S","TCC"=>"S","TCG"=>"S", \
+	"TCT"=>"S","TGA"=>"-","TGC"=>"C","TGG"=>"W","TGT"=>"C","TTA"=>"L","TTC"=>"F","TTG"=>"L","TTT"=>"F");\
+	foreach $$s (@seq){ print "$$s\n";for($$x=0;$$x<length($$dna{$$s});$$x=$$x+180){ $$line=substr($$dna{$$s},$$x,180);\
+	for($$y=0;$$y<length($$line);$$y=$$y+3){ $$triplet=substr($$line,$$y,3); \
+	$$base2aa{$$triplet}="X" unless defined $$base2aa{$$triplet}; \
+	print $$base2aa{$$triplet} unless $$base2aa{$$triplet} eq "-";} print "\n"}}' >$@
+
+%.cph.fa:	%.cph
+	for pdbid in $$(cat $< | gawk '{print $$2}' | sort | uniq); do wget http://www.rcsb.org/pdb/files/$$pdbid.pdb.gz; done
+	wait
+	for pdbid in $$(cat $< | gawk '{print $$2}' | sort | uniq | gawk '{print $$1".pdb.gz"}'); do gunzip $$pdbid; done
+	#for pdbid in $$(for pdbid in *.pdb; do basename $$pdbid .pdb; done); do gmake $$pdbid.fa; done
+	for pdbid in $$(cat $< | gawk '{print $$2}' | sort | uniq); do gmake $$pdbid.fa; done
+	#for pdbid in *.fa; do perl multi_alignaa.pl $(shell basename $< .cph).fa $$pdbid >> $@; done
+	for pdbid in $$(cat $< | gawk '{print $$2}' | sort | uniq | gawk '{print $$1".fa"}'); do cat $$pdbid >>$@; done
+#==============
+
+OBJS =	mew-refile-view.elc mew-nmz.elc mew-gnus.elc mew-toolbar-frame.elc
+
+show:
+	@echo "***************************************************************"
+	@echo DATE	= $(DATE) - $(TIME)
+	@echo SYS       = $(SED)
+	@echo G3        = $(AWK)
+	@echo BASE	= $(BASE) $(ATLAS_ROOT)
+	@echo UNAME	= $(UNAME)
+	@echo "ARCH=\"${ARCH}\""
+	@echo "VERSION=\"${VERSION},REV=${REV}\""
+	@echo $(OBJS) | sed -e 's/\(mew[^ ]*\.el\)c/"\1"/g'
+#	@ls $+;  cat $+
+
+LIST = one two three
+all:
+	@for i in $(LIST); do \
+		echo $$i; \
+	done
+
+clean:
+	#$(RM) *.seg.s*
+	$(RM) *.fsa
+
+#++++++++ DON'T MAKE +++++++++++++++
+dist:	$(SRCS) $(AUX)
+	echo tar-`sed \
+	-e '/version_string/!d' \
+	-e 's/[^0-9.]*\([0-9.]*\).*/\1/' \
+	-e q
+	version.c` > .fname
+	-rm -rf `cat .fname`
+	mkdir `cat .fname`
+	ln $(SRCS) $(AUX) `cat .fname`
+	tar chZf `cat .fname`.tar.Z `cat .fname`
+	-rm -rf `cat .fname` .fname
