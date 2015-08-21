@@ -1,5 +1,6 @@
 #!/bin/bash
 # DESCRIPTION: Downloads a given IETF Request for Comments (RFC)
+# SEE: https://en.wikipedia.org/wiki/Request_for_Comments
 # AUTHOR: Christoph Champ <http://www.christophchamp.com>
 RFC=$1
 wget https://www.rfc-editor.org/rfc/rfc${RFC}.txt -O rfc${RFC}.txt.gz
