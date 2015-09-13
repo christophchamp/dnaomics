@@ -575,6 +575,7 @@ dig +short myip.opendns.com @resolver1.opendns.com # Extract your external IP ad
  -> curl l2.io/ip
  -> curl ip.appspot.com
  -> curl ifconfig.me/ip  # JSON: curl ifconfig.me/all.json
+ -> dig +short my.ip @outsideip.net
 sed -i 18d .ssh/known_hosts # Remove offending key from known_hosts
 [[ $(find /path/to/file -type f -size +51200c 2>/dev/null) ]] && echo true || echo false # Check if a file exists and has a size greater than X
 git ls-files | xargs wc -l | awk -F ' +|\\.|/' '{ sumlines[$NF] += $2 } END { for (ext in sumlines) print ext, sumlines[ext] }' # Count the lines of each file extension in a list of files
@@ -644,4 +645,74 @@ lynx --dump http://www.whatismyasn.org/
 for f in images/*.JPG; do t=${f##*/}; convert $f -resize 640 ${t%.JPG}.png; done # reduce image size for websites
 du -sh */ | sort -h # Show directory size and sort by human readable amount (MB, GB, etc.). Requires fairly recent version of GNU sort.
 tr A-Za-z N-ZA-Mn-za-m <<<"Guvf Gjrrg sebz @pyvzntvp unf orra jvguuryq va erfcbafr gb n ercbeg sebz gur pbclevtug ubyqre" # rot13
+while read; do ipcalc $(awk '{print $1}' <(echo "$REPLY")) | awk '/^Network:/ {print $2}' done < sorted_address.txt
+od -An -w999 -t xC <<< "Hellobar%dsf?q=foo" | sed 's/[ ]\?\(c[23]\) \(..\)/%\1%\2/g;s/ /\\\\\x/g'| xargs echo -ne # urlencode
+mplayer input.mp3 -ao pcm:file=output.wav ; oggenc output.wav # convert mp3 to ogg format
+exec 5<>/dev/tcp/time.nist.gov/13; cat <&5 & cat >&5; exec 5>&- # Read and write to TCP sockets with common bash tools
+pyt() { youtube-dl -q --max-downloads 1 --no-playlist --default-search ${2:-ytsearch} "$1" -o - | mplayer -vo null /dev/fd/3 3<&0 </dev/tty; } # Search and play youtube videos directly to terminal (no X needed)
+ -> pyt() { id=$(curl -s 'https://www.youtube.com/results?search_query='$(tr \  + <<<"$1") | grep -om3 '"[[:alnum:]]\{11\}"' | awk NR==3 | tr -d \"); youtube-dl -q 'https://www.youtube.com/watch?v='"$id" -o - | mplayer -vo null /dev/fd/3 3<&0 </dev/tty; }
+pvl() { (for i in "$@"; do youtube-dl -q --max-downloads 1 --no-playlist "$i" -o - | mplayer -vo null /dev/fd/3 3<&0 </dev/tty; sleep .5; done); } # Play online music videos in terminal
+sort -s -b -t' ' -k 4.9,4.12n -k 4.5,4.7M -k 4.2,4.3n -k 4.14,4.15n -k 4.17,4.18n -k 4.20,4.21n access.log* # Sort Apache access.log by date and time
+echo "text to prepend" | cat - file
+lsblk -do name,model,serial # Show drive names next to their full serial number (and disk info)
+f=$(($RANDOM%5900+100));play -qn synth sin $f trim 0 0.75 vol .1;read -p "Hz(100-6000)? " g;printf "Hz=$f; Off by %d\n" $((f-g)) # Hz game.
 
+==August 2015==
+grep Rackspace /usr/share/wireshark/manuf
+dig +noauthority +noquestion +nostats xtof.ch @dns1.stabletransit.com # query "authoritative answer" (aa) for absolute TTL
+ -> dig +noauthority +noquestion +nostats xtof.ch # non-authoritative answer (i.e., caching DNS server). TTL value decreases for each query until 0.
+ -> dig +nssearch host.example.com # get a list of authoriative answer DNS servers
+ -> host -t soa xtof.ch # Get Start of Authority Resource Record (SOA)
+ls -l /usr/local/{s,}bin # Long list contents of two directories at once. Same as ls -l /usr/local/sbin /usr/local/bin
+sed 's/^[^@]\+$/&@example.com/' emails.txt |tr '\n' , # Add @example.com to the end of lines that don't have @ in them and join em w/ ,s
+r=$((RANDOM%4096));c=$(echo "obase=16;$r"|bc);display -size 300x300 -title '' xc:"#$c";read -p "Color? " g;echo "Color was $c" # Color Game
+curl -s xkcd\.com/1560/ |sed -n 's/.*bubblegum.png.*title="\([^"]\+\)".*/\1/p' |pee "html2text -width $COLUMNS" "wc -w" # count words #xkcd
+echo "obase=2;255"|bc # base 10 to binary
+var=$(<file); echo ${#var} # print number of characters in file
+ -> awk 'BEGIN{FS=""}{for(i=1;i<=NF;i++)c++}END{print "total chars:"c}' file
+ -> ruby -0777 -ne 'print $_.size' file # includes newline character
+ -> wc -m file # includes newline character
+ -> stat -c%s file # includes newline character
+ -> echo "foobar"|od -ta # includes newline character
+iconv -c -f utf-8 -t ascii input.txt > output.txt # clear all non-ASCII characters
+look foo # display lines beginning with a given string
+date -d '2010-04-16 + 1946 days' # The -d option in `date` lets you specify a date to display (delta days)
+awk -F, '/FAILURE/{print $5}' 2FA-log.csv |while read ip; do printf "$ip "; geoiplookup $ip; done |grep -v -e " US," # "Foreign" 2FA fails
+fetchmail --ssl --keep -u youremail@yourmaildomain imap.server # Fetch a copy of your IMAP inbox and send it to your localhost mailserver.
+awk -F[\\t/] '{l=substr($4,0,1);a[l]+=$1}END{for (i in a){printf "%s %10d\n", i, a[i]}}' userdiskstats.txt |sort # Sum stats by user letter
+gzip -v9 -c /var/log/maillog > /root/maillog.gz # Out of space? Compress large log to other filesystem, then delete & move the old log back.
+http://levien.com/type/myfonts/inconsolata.html
+ -> http://hivelogic.com/articles/top-10-programming-fonts
+ -> http://www.lowing.org/fonts/
+ps auxwwf | less +/[1]9797 # View process table in tree format and search directly to 19797 (the pid), avoiding this command itself.
+rsync -nav -e ssh /etc root@remotehost:/etc # Just see what files under /etc are different between the local host and remotehost.
+grep -h LoadModule *.conf | awk '{print $NF}' | xargs ls > /dev/null # Check which Apache modules aren't installed.
+:%! awk '{print $2}' # In vim command mode, this will replace ALL the text in the buffer with just the second column from the buffer.
+diff <(sed 's/-[0-9].*$//' old-rpms.txt) <(sed 's/-[0-9].*$//' new-rpms.txt) | grep '< ' # Show most of the rpms I'm missing on new server.
+ls -l *.txt| { wc -l; [ $? -eq 5 ]; }
+fc -nl -10 0 | sed -r 's/^\s+//' > script.sh # Save the last 10 commands that you ran to a file called script.sh. sed trims the whitespace. (note: `fc` is a Bash builtin.)
+command -v git # POSIX standard alternative to `which`
+ -> type git
+ -> which git
+while ls *.gz*;do for i in *.gz*;do [ -f ${i/.gz/} ]||gunzip -f -c $i > ${i/.gz/} && rm -vf $i ;done; done # unzip all zips \,,/(^_^)\,,/
+awk '$9~/^[45]/' *-access_log.2015* | wc -l # Count the total number of invalid (4xx and 5xx status) requests in 2015 on all websites.
+awk '{sum+=$10} END {print sum}' *-access_log.2015* # Show the total bandwidth consumed by websites so far in 2015.
+ls -l /home | awk '$3~/^[0-9]+$/' # Print out home directories owned by users without a valid password entry.
+atq | sort -k6n -k3M -k4n -k5n # Show at jobs, but sort them by the time of day.
+find /home -uid -500 -o \( -gid -500 -a \! -gid 100 \) # Find any files under /home owned by system accounts/groups, except users (gid=100)
+find -L /etc -type l # Find broken symbolic links under /etc.
+ -> python>>> import os.path; os.path.islink('initrd.img') # https://docs.python.org/2/library/os.path.html#os.path.islink
+stdbuf # Run COMMAND, with modified buffering operations for its standard streams
+ -> stdbuf -i0 -o0 -e0 ./tests/tests 2>&1 | tee log # <http://unix.stackexchange.com/questions/56634>)
+ -> tail -f access.log | stdbuf -oL cut -d ' ' -f1 | uniq # immedidately display unique entries from access.log
+man -s 2,3 mkdir search only system calls (2) and library (3) man pages
+date --date=yesterday +%d
+
+==September 2015==
+play -n -c1 synth whitenoise band -n 100 20 band -n 50 20 gain +30 fade h 1 86400 1 # Pretend you are on a starship
+ls "foo bar" 2>&1 > /dev/null | grep -o !#:1 # You've seen `echo *` list your files, but have you seen `ls` echo text?
+ -> echo "foo bar" baz | grep -o !#:2
+awk '{print "\x27" $1 "\x27,"}' file # use \x27 to specify a single quote character using hexadecimal escaping
+pppstats | cut -d" " -f2 | tail -n +2 | xargs printf "%s/2^20\n" | calc -p | cut -f2 | xargs printf "Use: %s MB\n" # 3g dongle bandwidth
+f=(*.mp3); mpg123 "${f[@]:50" # Start playing music files with the 51st file in (0 indexed). Good for when wildcards would be too complex
+s2both || s2ram || s2disk
