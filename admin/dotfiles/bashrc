@@ -32,6 +32,7 @@ export MTR_OPTIONS=-t  # force ncurses view on mtr
 #export LESS='-R'
 #export LESSOPEN="|~/.lessfilter %s"
 #export LESSCOLORIZER=/usr/bin/pygmentize
+complete -C '/usr/local/bin/aws_completer' aws
 
 ## ALIASES ##
 #alias lpr='lpr -P Rollright860'
@@ -54,6 +55,7 @@ alias pycclean='find . -name "*.pyc" -exec rm {} \;'
 alias pymods='python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"'
 alias pysitepkgs='python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"'
 alias pytasks='grep --exclude-dir=.git -rEI "TODO|FIXME" . 2>/dev/null'
+alias djangoversion='python -c "import django; print(django.get_version())"'
 #alias ssh='ssh -R 10999:localhost:22'
 alias nethack='telnet nethack.alt.org'
 alias cmy='mysql -B -N -e'
@@ -72,6 +74,7 @@ alias cdburn='cdrecord fs=16m speed=8 padsize=63s -pad -dao -v -' # `cat disc.is
 
 ## FUNCTIONS ##
 function ffbookmarks() { sqlite3 ~/.mozilla/firefox/*.[dD]efault/places.sqlite "SELECT strftime('%Y-%m-%d %H:%M:%S', dateAdded/1000000, 'unixepoch', 'localtime'),url FROM moz_places, moz_bookmarks WHERE moz_places.id = moz_bookmarks.fk ORDER BY dateAdded;";
+#transfer() { if [ $# -eq 0 ]; then echo "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"; return 1; fi; tmpfile=$( mktemp -t transferXXX ); if tty -s; then basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g'); curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile; else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ; fi; cat $tmpfile; rm -f $tmpfile; }
 getlocation() { lynx -dump http://www.ip-adress.com/ip_tracer/?QRY=$1|grep address|egrep 'city|state|country'|awk '{print $3,$4,$5,$6,$7,$8}'|sed 's\ip address flag \\'|sed 's\My\\';}
 aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
 down4me() { curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g' ; }   #Check if a domain is down
@@ -81,6 +84,7 @@ df -lP|awk '{sum+=$3}END{printf "%d GiB\n", sum/2^20}';
 #df -lP|numsum -3|numprocess /%$(( 2**20 ))/
 }
 timeDNS() { parallel -j0 --gnu --tag dig @{} "$*" ::: 208.67.222.222 208.67.220.220 198.153.192.1 198.153.194.1 156.154.70.1 156.154.71.1 8.8.8.8 8.8.4.4 | grep Query | sort -nk5; }
+tolower(){ echo ${@,,}; } # Make function command 'tolower' that will convert all arguments to lowercase.
 function sgoogle { Q="$@"; GOOG_URL='https://www.google.de/search?tbs=li:1&q='; AGENT="Mozilla/4.0"; stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}${Q//\ /+}" | grep -oP '\/url\?q=.+?&amp' | sed 's|/url?q=||; s|&amp||'); echo -e "${stream//\%/\x}"; } # Google verbatim search on your terminal
 google() {
     #http://superuser.com/questions/47192/google-search-from-linux-terminal
